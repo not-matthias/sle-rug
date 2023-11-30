@@ -1,6 +1,6 @@
 {pkgs, ...}: {
   packages = with pkgs; [
-    jdk17
+    rascal
   ];
 
   languages.java.enable = true;

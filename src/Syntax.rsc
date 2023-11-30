@@ -10,8 +10,10 @@ extend lang::std::Id;
 start syntax Form 
   = "form" Id name "{" Question* questions "}"; 
 
-// TODO: question, computed question, block, if-then-else, if-then
-syntax Question = ;
+syntax SimpleQuestion = Str Id id ":" Type type ("=" Expr expr)?;
+syntax ConditionalQuestion = "if" "(" Expr expr ")" "{" Question* questions "}" ("else" "{" Question* questions "}")?;
+
+syntax Question = SimpleQuestion | ConditionalQuestion;
 
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
 // Think about disambiguation using priorities and associativity
@@ -20,14 +22,13 @@ syntax Expr
   = Id \ "true" \ "false" // true/false are reserved keywords.
   ;
   
-syntax Type = ;
+syntax Type = "boolean" | "integer" | "string";
 
-lexical Str = ;
+lexical Str = [a-zA-Z][a-zA-Z0-9]*;
 
-lexical Int 
-  = ;
+lexical Int = [0-9]+;
 
-lexical Bool = ;
+lexical Bool = "true" | "false";
 
 
 
