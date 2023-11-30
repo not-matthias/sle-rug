@@ -17,3 +17,4 @@ public Tree testSimple(str input){
     Tree res = parse(#start[Form], input);
     return res;
 }
+
