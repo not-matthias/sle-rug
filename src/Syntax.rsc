@@ -8,12 +8,15 @@ extend lang::std::Id;
  */
 
 start syntax Form 
-  = "form" Id name "{" Question* questions "}"; 
+  = "form" Id "{" Question* questions "}"; 
 
-syntax SimpleQuestion = Str Id id ":" Type type ("=" Expr expr)?;
+syntax SimpleQuestion = Str Id ":" Type;
+syntax CalculatedQuestion = Str Id ":" Type "=" Expr expr;
 syntax ConditionalQuestion = "if" "(" Expr expr ")" "{" Question* questions "}" ("else" "{" Question* questions "}")?;
 
-syntax Question = SimpleQuestion | ConditionalQuestion;
+syntax Question = CalculatedQuestion | SimpleQuestion | ConditionalQuestion;
+
+keyword ControlKeywords = "if" | "else";
 
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
 // Think about disambiguation using priorities and associativity
@@ -29,6 +32,3 @@ lexical Str = [a-zA-Z][a-zA-Z0-9]*;
 lexical Int = [0-9]+;
 
 lexical Bool = "true" | "false";
-
-
-
