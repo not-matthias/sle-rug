@@ -5,7 +5,8 @@ import IO;
 import vis::Text; //prettyTree
 
 public void runAllTests(){
-    str fileContent = readFile(|file:///Users/tobiaspucher/GitHub/sle-rug/examples/tests/simple.myql|);
+    str fileContent = readFile(|file:///home/not-matthias/Documents/technical/git/sle-rug/examples/tests/simple.myql|);
+    // str fileContent = readFile(|file:///Users/tobiaspucher/GitHub/sle-rug/examples/tests/simple.myql|);
     Tree t = testSimple(fileContent);
     println("Tree: ");
     println(t);
