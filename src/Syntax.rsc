@@ -18,6 +18,7 @@ syntax ConditionalQuestion = "if" "(" Expr ")" "{" Question* questions "}" ("els
 
 syntax Question = SimpleQuestion | CalculatedQuestion | ConditionalQuestion;
 
+// TODO: Double check this (use correct associativity)
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
 // Think about disambiguation using priorities and associativity
 // and use C/Java style precedence rules (look it up on the internet)
@@ -25,6 +26,9 @@ syntax Question = SimpleQuestion | CalculatedQuestion | ConditionalQuestion;
 syntax Expr 
   = Id \ "true" \ "false" // true/false are reserved keywords.
   | Int
+  | "(" Expr ")"
+
+  // Arithmetic operators
   > left (
     Expr a "*" Expr b
   | Expr a "/" Expr b
@@ -33,7 +37,23 @@ syntax Expr
     Expr a "+" Expr b
   | Expr a "-" Expr b
   )
-  | "(" Expr ")"
+
+  // Boolean operators
+  > right "!" Expr
+  > left (
+    Expr a "\<" Expr b
+  | Expr a "\<=" Expr b
+  | Expr a "\>" Expr b
+  | Expr a "\>=" Expr b
+  )
+  > left (
+    Expr a "==" Expr b
+  | Expr a "!=" Expr b
+  )
+  > left (
+    Expr a "&&" Expr b
+  | Expr a "||" Expr b
+  )
   ; 
   
 syntax Type = "boolean" | "integer" | "string";
