@@ -7,31 +7,59 @@ extend lang::std::Id;
  * Concrete syntax of QL
  */
 
+// TODO: Add more keywords
+keyword ControlKeywords = "if" | "else" | "form";
+
 start syntax Form = "form" Id "{" Question* "}"; 
 
-//syntax SimpleQuestion = Label Id ":" Type;
-syntax SimpleQuestion = Label;
-//syntax CalculatedQuestion = Label l Id id ":" Type "=" Expr expr;
-//syntax ConditionalQuestion = "if" "(" Expr expr ")" "{" Question* questions "}" ("else" "{" Question* questions "}")?;
+syntax SimpleQuestion = Str Id ":" Type;
+syntax CalculatedQuestion = SimpleQuestion "=" Expr;
+syntax ConditionalQuestion = "if" "(" Expr ")" "{" Question* questions "}" ("else" "{" Question* questions "}")?;
 
-syntax Question = SimpleQuestion;
+syntax Question = SimpleQuestion | CalculatedQuestion | ConditionalQuestion;
 
-//keyword ControlKeywords = "if" | "else";
-
+// TODO: Double check this (use correct associativity)
 // TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
 // Think about disambiguation using priorities and associativity
 // and use C/Java style precedence rules (look it up on the internet)
-/* syntax Expr 
+// Associativity reference: https://www.rascal-mpl.org/docs/Rascal/Declarations/SyntaxDefinition/Disambiguation/Associativity/
+syntax Expr 
   = Id \ "true" \ "false" // true/false are reserved keywords.
-  ; */
+  | Int
+  | "(" Expr ")"
+
+  // Arithmetic operators
+  > left (
+    Expr a "*" Expr b
+  | Expr a "/" Expr b
+  )
+  > left (
+    Expr a "+" Expr b
+  | Expr a "-" Expr b
+  )
+
+  // Boolean operators
+  > right "!" Expr
+  > left (
+    Expr a "\<" Expr b
+  | Expr a "\<=" Expr b
+  | Expr a "\>" Expr b
+  | Expr a "\>=" Expr b
+  )
+  > left (
+    Expr a "==" Expr b
+  | Expr a "!=" Expr b
+  )
+  > left (
+    Expr a "&&" Expr b
+  | Expr a "||" Expr b
+  )
+  ; 
   
 syntax Type = "boolean" | "integer" | "string";
 
-syntax Label = LabelLiteral;
-
 //regex: https://www.rascal-mpl.org/docs/Rascal/Patterns/Regular/
-lexical LabelLiteral = [\"] ![\"]* [\"];
-lexical Int = "-"?[0-9]+;
+// lexical Str = [\"][\w\d\s\p]*[\"]; // TODO: Why does this not work? Would be much cleaner.
+lexical Str = [\"] ![\"]* [\"];
+lexical Int = [0-9]+;
 lexical Bool = "true" | "false";
-
-//lexical Str = [a-zA-Z][a-zA-Z0-9]*;
