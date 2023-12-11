@@ -30,10 +30,8 @@ syntax Type = "boolean" | "integer" | "string";
 syntax Label = LabelLiteral;
 
 //regex: https://www.rascal-mpl.org/docs/Rascal/Patterns/Regular/
-lexical LabelLiteral = [\"][a-zA-Z0-9] *[\"];
+lexical LabelLiteral = [\"] ![\"]* [\"];
+lexical Int = "-"?[0-9]+;
+lexical Bool = "true" | "false";
 
 //lexical Str = [a-zA-Z][a-zA-Z0-9]*;
-
-//lexical Int = [0-9]+;
-
-// lexical Bool = "true" | "false";
