@@ -23,6 +23,7 @@ syntax Question = SimpleQuestion | CalculatedQuestion | ConditionalQuestion;
 // Think about disambiguation using priorities and associativity
 // and use C/Java style precedence rules (look it up on the internet)
 // Associativity reference: https://www.rascal-mpl.org/docs/Rascal/Declarations/SyntaxDefinition/Disambiguation/Associativity/
+// Priority reference: https://www.rascal-mpl.org/docs/Rascal/Declarations/SyntaxDefinition/Disambiguation/Priority/
 syntax Expr 
   = Id \ "true" \ "false" // true/false are reserved keywords.
   | Int
