@@ -14,7 +14,7 @@ start syntax Form = "form" Id "{" Question* "}";
 
 syntax SimpleQuestion = Str Id ":" Type;
 syntax CalculatedQuestion = SimpleQuestion "=" Expr;
-syntax ConditionalQuestion = "if" "(" Expr ")" "{" Question* questions "}" ("else" "{" Question* questions "}")?;
+syntax ConditionalQuestion = "if" "(" Expr e ")" "{" Question* ifquestions "}" ("else" "{" Question* elsequestions "}")?;
 
 syntax Question = SimpleQuestion | CalculatedQuestion | ConditionalQuestion;
 
@@ -57,7 +57,7 @@ syntax Expr
   )
   ; 
   
-syntax Type = "boolean" | "integer" | "string";
+lexical Type = "boolean" | "integer" | "string";
 
 //regex: https://www.rascal-mpl.org/docs/Rascal/Patterns/Regular/
 // lexical Str = [\"][\w\d\s\p]*[\"]; // TODO: Why does this not work? Would be much cleaner.
