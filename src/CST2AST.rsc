@@ -3,6 +3,8 @@ module CST2AST
 import Syntax;
 import AST;
 import ParseTree;
+import String;
+import Boolean;
 
 import IO; //for println
 
@@ -22,7 +24,8 @@ AForm cst2ast(start[Form] sf) {
   switch (f) {
     case (Form)`form <Id name> { <Question* questions> }`:
       return form(id("<name>", src=name.src), [cst2ast(q) | Question q <- questions], src=f.src);
-      default: throw "Unhandled form: <f>";
+
+    default: throw "Unhandled form: <f>";
   }
 }
 
@@ -40,16 +43,17 @@ default AQuestion cst2ast(Question q) {
       //return conditionalQuestion(cst2ast(cq.e), [cst2ast(x) | x <- cq.ifquestions], [cst2ast(x) | x <- cq.elsequestions], src=q.src);
       throw "case cq";
     }
-  }
- 
-  throw "Not yet implemented <q>";
-}
 
+    default: throw "Unhandled question: <q>";
+  }
+}
 
 // `...` is a concrete syntax pattern which can be matched against the CST
 AExpr cst2ast(Expr e) {
+  println(e);
+
   switch (e) {
-    case (Expr)`<Id x>`: return ref(id("<x>", src=x.src), src=x.src);
+    case (Expr)`<Id x>`: return ref(id("<x>", src=x.src), src=e.src);
     case (Expr)`<Expr e1> + <Expr e2>`: return add(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> - <Expr e2>`: return sub(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> * <Expr e2>`: return mul(cst2ast(e1), cst2ast(e2), src=e.src);
@@ -58,6 +62,12 @@ AExpr cst2ast(Expr e) {
     case (Expr)`<Expr e1> \> <Expr e2>`: return gt(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> \<= <Expr e2>`: return lte(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> \>= <Expr e2>`: return gte(cst2ast(e1), cst2ast(e2), src=e.src);
+    case (Expr)`<Int n>`: return intLit(toInt("<n>"), src=n.src);
+    case (Expr)`<Str s>`: return strLit("<s>", src=s.src);
+    case (Expr)`<Bool b>`: return boolLit(fromString("<b>"), src=b.src);
+
+    case (Expr)`(<Expr e>)`: return cst2ast(e);
+
     default: throw "Unhandled expression: <e>";
   }
 }

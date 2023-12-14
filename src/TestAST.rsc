@@ -7,18 +7,18 @@ import CST2AST;
 import IO;
 
 public void runAllTests(){
-    str fileContent = readFile(|cwd:///examples/tests/simple.myql|);
-    Tree parsed = parse(#start[Form], fileContent);
-    println("ParseTree: ");
-    println(parsed);
-    
-    AForm t = testSimple(parsed);
+    AForm t = testSimple(readFile(|cwd:///examples/tests/ast.myql|));
+    println("AForm: ");
+    println(t);
+
+    AForm t = testSimple(readFile(|cwd:///examples/binary.myql|));
     println("AForm: ");
     println(t);
 }
 
 
-public AForm testSimple(start[Form] input){
-    return cst2ast(input);
+public AForm testSimple(str input){
+    Tree parsed = parse(#start[Form], input);
+    return cst2ast(parsed);
 }
 

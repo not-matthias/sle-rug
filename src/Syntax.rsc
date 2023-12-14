@@ -27,6 +27,8 @@ syntax Question = SimpleQuestion | CalculatedQuestion | ConditionalQuestion;
 syntax Expr 
   = Id \ "true" \ "false" // true/false are reserved keywords.
   | Int
+  | Str
+  | Bool
   | "(" Expr ")"
 
   // Arithmetic operators
