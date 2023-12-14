@@ -2,8 +2,9 @@ module CST2AST
 
 import Syntax;
 import AST;
-
 import ParseTree;
+
+import IO; //for println
 
 /*
  * Implement a mapping from concrete syntax trees (CSTs) to abstract syntax trees (ASTs)
@@ -26,15 +27,18 @@ AForm cst2ast(start[Form] sf) {
 }
 
 default AQuestion cst2ast(Question q) {
+  println(q);
+
   switch(q) {
-    case (SimpleQuestion)`<Str label> <Id i> : <Type t>`:
+    case (Question)`<Str label> <Id i> : <Type t>`:
       return question(id("<i>", src=i.src), "<label>", cst2ast(t), src=q.src);
       
-    case (CalculatedQuestion)`<Str label> <Id i> : <Type t> = <Expr e>`:
+    case (Question)`<Str label> <Id i> : <Type t> = <Expr e>`:
       return calculatedQuestion(id("<i>", src=i.src), "<label>", cst2ast(t), cst2ast(e), src=q.src);
 
-    case ConditionalQuestion cq: {
-      return conditionalQuestion(cst2ast(cq.e), [cst2ast(x) | x <- cq.ifquestions], [cst2ast(x) | x <- cq.elsequestions], src=q.src);
+    case (Question) cq: {
+      //return conditionalQuestion(cst2ast(cq.e), [cst2ast(x) | x <- cq.ifquestions], [cst2ast(x) | x <- cq.elsequestions], src=q.src);
+      throw "case cq";
     }
   }
  
@@ -59,6 +63,7 @@ AExpr cst2ast(Expr e) {
 }
 
 AType cst2ast(Type t) {
+  println(t); // does not get printed!!!
   switch(t) {
     case "boolean": return boolean(src=t.src);
     case "integer": return integer(src=t.src);
