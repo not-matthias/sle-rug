@@ -11,9 +11,10 @@ runAllTests();
 ```
 import Syntax;
 import AST;
-import TestSyntax;
+import CST2AST;
+import TestAST;
 
-cst2ast(form);
+runAllTests();
 ```
 
 # Week 4
