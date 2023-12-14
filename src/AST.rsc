@@ -8,7 +8,7 @@ module AST
  */
 
 data AForm(loc src = |tmp:///|)
-  = form(str name, list[AQuestion] questions)
+  = form(AId name, list[AQuestion] questions)
   ; 
 
 data AQuestion(loc src = |tmp:///|)

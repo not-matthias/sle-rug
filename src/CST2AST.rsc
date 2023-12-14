@@ -18,15 +18,21 @@ import ParseTree;
 AForm cst2ast(start[Form] sf) {
   Form f = sf.top; // remove layout before and after form
   
-  return form("", [ ], src=f.src); 
+  switch (f) {
+    case (Form)`form <Id name> { <Question* questions> }`:
+      return form(id("<name>", src=name.src), [cst2ast(q) | Question q <- questions], src=f.src);
+      default: throw "Unhandled form: <f>";
+  }
 }
 
 default AQuestion cst2ast(Question q) {
   switch(q) {
-    case (SimpleQuestion sq)`<Str label> <Id i> : <Type t>`:
-      return question(id("<id>", src=i.src), "<label>", cst2ast(t), src=q.src);
+    case (SimpleQuestion)`<Str label> <Id i> : <Type t>`:
+      return question(id("<i>", src=i.src), "<label>", cst2ast(t), src=q.src);
+      
     case (CalculatedQuestion)`<Str label> <Id i> : <Type t> = <Expr e>`:
-      return calculatedQuestion(id("<id>", src=i.src), "<label>", cst2ast(t), cst2ast(e), src=q.src);
+      return calculatedQuestion(id("<i>", src=i.src), "<label>", cst2ast(t), cst2ast(e), src=q.src);
+
     case ConditionalQuestion cq: {
       return conditionalQuestion(cst2ast(cq.e), [cst2ast(x) | x <- cq.ifquestions], [cst2ast(x) | x <- cq.elsequestions], src=q.src);
     }
