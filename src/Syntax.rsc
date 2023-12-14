@@ -14,7 +14,9 @@ start syntax Form = "form" Id "{" Question* "}";
 
 syntax SimpleQuestion = Str Id ":" Type;
 syntax CalculatedQuestion = SimpleQuestion "=" Expr;
-syntax ConditionalQuestion = "if" "(" Expr e ")" "{" Question* ifquestions "}" ("else" "{" Question* elsequestions "}")?;
+syntax ConditionalQuestion 
+  = "if" "(" Expr e ")" "{" Question* ifQuestions "}" "else" "{" Question* elseQuestions "}"
+  | "if" "(" Expr e ")" "{" Question* ifQuestions "}";
 
 syntax Question = SimpleQuestion | CalculatedQuestion | ConditionalQuestion;
 

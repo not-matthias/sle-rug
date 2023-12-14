@@ -1,0 +1,12 @@
+form binary {
+  "a" a: boolean
+  
+  if (a) { 
+  } else {
+    "b" b: boolean
+        
+    if (b) { 
+      "c" c: boolean
+    }
+  }
+}

@@ -14,9 +14,9 @@ data AForm(loc src = |tmp:///|)
 data AQuestion(loc src = |tmp:///|)
   = question(AId id, str label, AType qtype)
   | calculatedQuestion(AId id, str label, AType qtype, AExpr expr)
-  | conditionalQuestion(AExpr expr, list[AQuestion] ifQuestions, list[AQuestion] elseQuestions)
+  | ifQuestion(AExpr expr, list[AQuestion] ifQuestions)
+  | ifElseQuestion(AExpr expr, list[AQuestion] ifQuestions, list[AQuestion] elseQuestions)
   ;
-
 
 /* So far no distinction between arithmetic expressions and boolean expressions
 */

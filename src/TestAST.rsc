@@ -7,9 +7,9 @@ import CST2AST;
 import IO;
 
 public void runAllTests(){
-    AForm t = testSimple(readFile(|cwd:///examples/tests/ast.myql|));
-    println("AForm: ");
-    println(t);
+    // AForm t = testSimple(readFile(|cwd:///examples/tests/ast.myql|));
+    // println("AForm: ");
+    // println(t);
 
     AForm t = testSimple(readFile(|cwd:///examples/binary.myql|));
     println("AForm: ");
