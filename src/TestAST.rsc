@@ -7,13 +7,15 @@ import CST2AST;
 import IO;
 
 public void runAllTests(){
-    // AForm t = testSimple(readFile(|cwd:///examples/tests/ast.myql|));
-    // println("AForm: ");
-    // println(t);
-
-    AForm t = testSimple(readFile(|cwd:///examples/binary.myql|));
+    AForm t = testSimple(readFile(|cwd:///examples/tests/ast.myql|));
     println("AForm: ");
     println(t);
+
+    testSimple(readFile(|cwd:///examples/binary.myql|));
+    testSimple(readFile(|cwd:///examples/cyclic.myql|));
+    testSimple(readFile(|cwd:///examples/empty.myql|));
+    testSimple(readFile(|cwd:///examples/errors.myql|));
+    testSimple(readFile(|cwd:///examples/tax.myql|));
 }
 
 
