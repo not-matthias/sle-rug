@@ -3,5 +3,5 @@ form taxOfficeExample {
     hasBoughtHouse: boolean
     
   "Did you enter a loan?"
-    hasMaintLoan: boolean
+    hasMaintLoan: integer
 }

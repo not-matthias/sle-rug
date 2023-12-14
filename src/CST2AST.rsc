@@ -66,8 +66,8 @@ AType cst2ast(Type t) {
   println(t); // does indeed get printed!! xD
   switch(t) {
     case (Type)`boolean`: return boolean(src=t.src);
-    case "integer": return integer(src=t.src);
-    case "string": return string(src=t.src);
+    case (Type)`integer`: return integer(src=t.src);
+    case (Type)`string`: return string(src=t.src);
     default: throw "Unknown type: <t>";
   }
 }
