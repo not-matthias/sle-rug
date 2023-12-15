@@ -20,5 +20,9 @@ runAllTests();
 # Week 4
 
 ```
+import Check;
+import Resolve;
+import TestCheck;
 
+runAllTests();
 ```
