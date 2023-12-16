@@ -52,7 +52,22 @@ VEnv eval(AQuestion q, Input inp, VEnv venv) {
 Value eval(AExpr e, VEnv venv) {
   switch (e) {
     case ref(id(str x)): return venv[x];
+    case intLit(int n): return vint(n);
+    case strLit(str s): return vstr(s);
+    case boolLit(bool b): return vbool(b);
     
+    case add(AExpr left, AExpr right): return vint(eval(left, venv).n + eval(right, venv).n);
+    case sub(AExpr left, AExpr right): return vint(eval(left, venv).n - eval(right, venv).n);
+    case mul(AExpr left, AExpr right): return vint(eval(left, venv).n * eval(right, venv).n);
+    case div(AExpr left, AExpr right): return vint(eval(left, venv).n / eval(right, venv).n);
+    case eq(AExpr left, AExpr right): return vbool(eval(left, venv).n == eval(right, venv).n);
+    case neq(AExpr left, AExpr right): return vbool(eval(left, venv).n != eval(right, venv).n);
+
+    case lt(AExpr left, AExpr right): return vbool(eval(left, venv).n < eval(right, venv).n);
+    case lte(AExpr left, AExpr right): return vbool(eval(left, venv).n <= eval(right, venv).n);
+    case gt(AExpr left, AExpr right): return vbool(eval(left, venv).n > eval(right, venv).n);
+    case gte(AExpr left, AExpr right): return vbool(eval(left, venv).n >= eval(right, venv).n);
+
     // etc.
     
     default: throw "Unsupported expression <e>";
