@@ -9,7 +9,7 @@ import Check;
 import Resolve;
 
 public void runAllTests(){
-    testCheck(readFile(|cwd:///examples/tests/ast.myql|));
+    testCheck(readFile(|cwd:///examples/errors.myql|));
 }
 
 public void testCheck(str input){
