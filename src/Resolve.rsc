@@ -39,7 +39,7 @@ Def defs(AForm f) {
   Def defs = {};
 
   for (/AQuestion q <- f) {
-    defs += {<q.id.name, q.id.src>};
+    defs += {<id.name, id.src> | /AId id := q};
   }
 
   return defs;
