@@ -97,8 +97,22 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
       if (<u, loc d> <- useDef, <d, x, _, Type t> <- tenv) {
         return t;
       }
-    // etc.
+    case intLit(_): return tint();
+    case strLit(_): return tstr();
+    case boolLit(_): return tbool();
+    case add(lhs, rhs): return tint();
+    case sub(lhs, rhs): return tint();
+    case mul(lhs, rhs): return tint();
+    case div(lhs, rhs): return tint();
+    case eq(lhs, rhs): return tbool();
+    case neq(lhs, rhs): return tbool();
+    case lt(lhs, rhs): return tbool();
+    case lte(lhs, rhs): return tbool();
+    case gt(lhs, rhs): return tbool();
+    case gte(lhs, rhs): return tbool();
+    default: return tunknown();
   }
+  
   return tunknown(); 
 }
 
