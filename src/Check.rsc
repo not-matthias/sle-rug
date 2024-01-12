@@ -20,12 +20,12 @@ alias TEnv = rel[loc def, str name, str label, Type \type];
 TEnv collect(AForm f) {
   TEnv tenv = {};
   
-  // TODO: If/IfElse questions?
+  // TODO: If/IfElse questions? -> no, they only consume env (no new bindings)
   visit (f) {
     case question(id, label, ty):
       tenv += { <id.src, id.name, label, convertType(ty)> };
-    case calculatedQuestion(id, label, ty, expr):
-      tenv += { <id.src, id.name, label, convertType(ty)> };
+    case calculatedQuestion(id, label, ty, _):
+      tenv += { <id.src, id.name, label, convertType(ty)> }; // independent of expression type
   }
 
   return tenv;
@@ -33,9 +33,9 @@ TEnv collect(AForm f) {
 
 Type convertType(AType ty) {
   switch(ty) {
-  	case intType(): return tint();
-  	case boolType(): return tbool();
-  	case strType(): return tstr();
+  	case integer(): return tint();
+  	case boolean(): return tbool();
+  	case string(): return tstr();
   	default: return tunknown();
   }
 }
@@ -51,17 +51,24 @@ set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
   return msgs;
 }
 
+
+// wrapper for convenience
+set[Message] check(AForm f) { 
+  return check(f, collect(f), resolve(f).useDef);
+}
+
 // - produce an error if there are declared questions with the same name but different types.
 // - duplicate labels should trigger a warning 
 // - the declared type computed questions should match the type of the expression.
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
 
-  println("Checking question");
-
   // check for same name, different type
+  for (<a_loc, same_name, _, Type t1> <- tenv, <b_loc, same_name, _, Type t2> <- tenv, a_loc != b_loc, t1 != t2) {
+    msgs += { error("Same question with different type", a_loc) };
+  }
   
-  // check for duplicate labels
+  // check for duplicate labelse
 
   // check for type compatibility between declared type and expression type
 
@@ -78,8 +85,6 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 //   the requirement is that typeOf(lhs) == typeOf(rhs) == tint()
 set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
-  
-  println("Checking expression");
 
   switch (e) {
     case ref(AId x):

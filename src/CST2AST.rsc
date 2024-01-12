@@ -69,7 +69,6 @@ AExpr cst2ast(Expr e) {
 }
 
 AType cst2ast(Type t) {
-  println(t); // does indeed get printed!! xD
   switch(t) {
     case (Type)`boolean`: return boolean(src=t.src);
     case (Type)`integer`: return integer(src=t.src);
