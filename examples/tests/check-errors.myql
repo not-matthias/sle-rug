@@ -23,7 +23,16 @@ form taxOfficeExample {
   ""
     q2: integer
 
+  "Wrong type 1"
+    q3: integer = true
+  
+  "Wrong type 2"
+    q4: boolean = 1
+
+  "Wrong type 3"
+    q5: string = false
    
+  
   if (hasSodHouse) {
     "What was the selling price?"
       sellingPrice: boolean

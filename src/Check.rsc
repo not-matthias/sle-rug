@@ -79,6 +79,11 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
       for( <a_loc, _, label, _> <- tenv, <b_loc, _, label, _> <- tenv, a_loc != b_loc, (label notin {""})) {
         msgs += { warning("Duplicate label", a_loc) };
       }
+
+      // check computed type matches declared type
+      if (typeOf(expr, tenv, useDef) != convertType(qtype)) {
+        msgs += { error("Computed type does not match declared type", id.src) };
+      }
     }
     default: { println("default"); }
   }
