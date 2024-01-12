@@ -8,11 +8,22 @@ form taxOfficeExample {
   "Did you sell a house in 2010?"
     hasSoldHouse: boolean
 
-  "Question err 1"
+  "Question diff type err 1"
     hasT1: boolean
-  "Question err 2"
+  "Question diff type err 2"
     hasT1: integer
-    
+
+  "Question same label warn 1"
+    q_s_w_1: integer 
+  "Question same label warn 1"
+    q_s_w_2: integer
+
+  ""
+    q1: integer
+  ""
+    q2: integer
+
+   
   if (hasSodHouse) {
     "What was the selling price?"
       sellingPrice: boolean

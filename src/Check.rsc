@@ -57,18 +57,33 @@ set[Message] check(AForm f) {
   return check(f, collect(f), resolve(f).useDef);
 }
 
-// - produce an error if there are declared questions with the same name but different types.
-// - duplicate labels should trigger a warning 
-// - the declared type computed questions should match the type of the expression.
+// - [ ] produce an error if there are declared questions with the same name but different types.
+// - [X] duplicate labels should trigger a warning 
+// - [ ] the declared type computed questions should match the type of the expression.
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
 
-  // check for same name, different type
-  for (<a_loc, same_name, _, Type t1> <- tenv, <b_loc, same_name, _, Type t2> <- tenv, a_loc != b_loc, t1 != t2) {
-    msgs += { error("Same question with different type", a_loc) };
+  switch(q) {
+    case question( id, str label, AType _): {
+      // check for duplicate labels
+      for( <a_loc, _, label, _> <- tenv, <b_loc, _, label, _> <- tenv, a_loc != b_loc, (label notin {""})) {
+        msgs += { warning("Duplicate label", a_loc) };
+      }
+      // declared questions with the same name but different types
+      for (<a_loc, name, _, Type t1> <- tenv, <b_loc, name, _, Type t2> <- tenv, a_loc != b_loc, t1 != t2) {
+        msgs += { error("Same question with different type", a_loc) };
+      }
+    }
+    case calculatedQuestion(AId id, str label, AType qtype, AExpr expr): { 
+      // check for duplicate labels
+      for( <a_loc, _, label, _> <- tenv, <b_loc, _, label, _> <- tenv, a_loc != b_loc, (label notin {""})) {
+        msgs += { warning("Duplicate label", a_loc) };
+      }
+    }
+    default: { println("default"); }
   }
-  
-  // check for duplicate labelse
+
+
 
   // check for type compatibility between declared type and expression type
 
@@ -79,6 +94,7 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
 
   return msgs; 
 }
+
 
 // Check operand compatibility with operators.
 // E.g. for an addition node add(lhs, rhs), 
