@@ -2,6 +2,7 @@ module Eval
 
 import AST;
 import Resolve;
+import IO;
 
 /*
  * Implement big-step semantics for QL
@@ -37,17 +38,16 @@ data Input
 // (e.g. 0 for int, "" for str etc.)
 VEnv initialEnv(AForm f) {
   VEnv init = ();
-  for (AQuestion q <- f.questions) {
+  for (/AQuestion q <- f) {
     switch(q) {
-      case question(id(name), str label, AType qtype): {
+      case question(id(name), _, AType qtype): {
         switch(qtype) {
           case integer(): init[name] = vint(0);
           case boolean(): init[name] = vbool(false);
           case string(): init[name] = vstr("");
         };
       }
-      case calculatedQuestion(AId id, str label, AType qtype, AExpr expr): {
-        name = id.name;
+      case calculatedQuestion(id(name), _, AType qtype, _): {
         switch(qtype) {
           case integer(): init[name] = vint(0);
           case boolean(): init[name] = vbool(false);

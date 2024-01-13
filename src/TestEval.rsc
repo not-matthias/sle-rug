@@ -12,15 +12,51 @@ import Eval;
 
 public void runAllTests_Eval(){
     // TEST 1: 
+    println("TEST 1");
     VEnv res = testEval(readFile(|cwd:///examples/tests/eval_simple.myql|), 
                        ("x": 1
                        )
                     );
     
-    print("TEST 1 res: ");
     println(res);
     assert res == ("x": vint(1)
                   );
+
+    // TEST 2:
+    println("TEST 2");
+    res = testEval(readFile(|cwd:///examples/tests/eval_tax.myql|), 
+                   ("sellingPrice": 1337
+                   , "privateLoan": 420
+                   )
+                );
+    println(res);
+    assert res["valueResidue"] == vint(0);
+
+    // TEST 3:
+    println("TEST 3");
+    res = testEval(readFile(|cwd:///examples/tests/eval_tax.myql|), 
+                (  "sellingPrice": 1337, 
+                   "privateLoan": 420,
+                   "hasSoldHouse": true
+                   )
+                );
+    println(res);
+    assert res["valueResidue"] == vint(1337);
+    // TEST 4:
+    println("TEST 4");
+    res = testEval(readFile(|cwd:///examples/tests/eval_tax.myql|), 
+                (  "sellingPrice": 1337, 
+                   "privateLoan": 420,
+                   "privateDebt": 1000,
+                   "hasSoldHouse": true
+                   )
+                );
+    println(res);
+    assert res["valueResidue"] == vint(337);
+
+
+
+    println("ALL TESTS PASSED");
 }
 
 public VEnv testEval(str input_str_ql, map[str, value] inputs){
