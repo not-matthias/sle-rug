@@ -17,6 +17,15 @@ data Value
   | vstr(str s)
   ;
 
+Value Value_from_value(value v) {
+  switch (v) {
+    case int n: return vint(n);
+    case bool b: return vbool(b);
+    case str s: return vstr(s);
+  }
+  throw "Unsupported value <v>";
+}
+
 // The value environment
 alias VEnv = map[str name, Value \value];
 
@@ -27,7 +36,31 @@ data Input
 // produce an environment which for each question has a default value
 // (e.g. 0 for int, "" for str etc.)
 VEnv initialEnv(AForm f) {
-  return ();
+  VEnv init = ();
+  for (AQuestion q <- f.questions) {
+    switch(q) {
+      case question(id(name), str label, AType qtype): {
+        switch(qtype) {
+          case integer(): init[name] = vint(0);
+          case boolean(): init[name] = vbool(false);
+          case string(): init[name] = vstr("");
+        };
+      }
+      case calculatedQuestion(AId id, str label, AType qtype, AExpr expr): {
+        name = id.name;
+        switch(qtype) {
+          case integer(): init[name] = vint(0);
+          case boolean(): init[name] = vbool(false);
+          case string(): init[name] = vstr("");
+        };
+      }
+      default: { ; // nothing to do for other kinds of questions
+      }
+    }
+    
+  }
+
+  return init;
 }
 
 
@@ -40,13 +73,61 @@ VEnv eval(AForm f, Input inp, VEnv venv) {
 }
 
 VEnv evalOnce(AForm f, Input inp, VEnv venv) {
-  return (); 
+  
+  // update venv with input
+  venv[inp.question] = inp.\value;
+
+  // evaluate questions using updated venv
+  for (AQuestion q <- f.questions) {
+    venv = eval(q, inp, venv);
+  }
+  return venv;
 }
 
 VEnv eval(AQuestion q, Input inp, VEnv venv) {
   // evaluate conditions for branching,
   // evaluate inp and computed questions to return updated VEnv
-  return (); 
+  switch (q) {
+    case question(_, _, _): {
+      // nothing to do for "input" question
+      return venv;
+    }
+    case calculatedQuestion(AId id, _, _, AExpr expr): {
+      // evaluate expr using venv
+      venv[id.name] = eval(expr, venv);
+      return venv;
+    }
+    case ifQuestion(AExpr cond, qs): {
+      // evaluate cond using venv
+      if (eval(cond, venv).b) {
+        
+        // continue evaluation of branch
+        for (AQuestion q <- qs) {
+          venv = eval(q, inp, venv);
+        }
+        return venv;
+      }
+      else {
+        return venv;
+      }
+    }
+    case ifElseQuestion(AExpr cond, qs, qsElse): {
+      if (eval(cond, venv).b) {
+        for (AQuestion q <- qs) {
+          venv = eval(q, inp, venv);
+        }
+        return venv;
+      }
+      else {
+        for (AQuestion q <- qsElse) {
+          venv = eval(q, inp, venv);
+        }
+        return venv;
+      }
+    } 
+  }
+  
+  throw "Unsupported question in eval: <q>"; 
 }
 
 Value eval(AExpr e, VEnv venv) {

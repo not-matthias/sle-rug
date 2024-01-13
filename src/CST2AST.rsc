@@ -48,6 +48,7 @@ default AQuestion cst2ast(Question q) {
 }
 
 // `...` is a concrete syntax pattern which can be matched against the CST
+// presedence is from low to high because switch stops at the first match
 AExpr cst2ast(Expr e) {
   switch (e) {
     case (Expr)`<Id x>`: return ref(id("<x>", src=x.src), src=e.src);
@@ -55,7 +56,6 @@ AExpr cst2ast(Expr e) {
     case (Expr)`<Str s>`: return strLit("<s>", src=s.src);
     case (Expr)`<Bool b>`: return boolLit(fromString("<b>"), src=b.src);
     case (Expr)`(<Expr e>)`: return cst2ast(e);
-
     case (Expr)`<Expr e1> + <Expr e2>`: return add(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> - <Expr e2>`: return sub(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> * <Expr e2>`: return mul(cst2ast(e1), cst2ast(e2), src=e.src);

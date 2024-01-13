@@ -20,7 +20,7 @@ alias TEnv = rel[loc def, str name, str label, Type \type];
 TEnv collect(AForm f) {
   TEnv tenv = {};
   
-  // TODO: If/IfElse questions? -> no, they only consume env (no new bindings)
+  // TODO: If/IfElse questions? -> tobias: no, they only consume env (no new bindings)
   visit (f) {
     case question(id, label, ty):
       tenv += { <id.src, id.name, label, convertType(ty)> };
@@ -42,7 +42,6 @@ Type convertType(AType ty) {
 
 set[Message] check(AForm f, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
-
   // check for duplicate questions
   for (/AQuestion q <- f) {
     msgs += check(q, tenv, useDef);
@@ -57,9 +56,9 @@ set[Message] check(AForm f) {
   return check(f, collect(f), resolve(f).useDef);
 }
 
-// - [ ] produce an error if there are declared questions with the same name but different types.
+// - [X] produce an error if there are declared questions with the same name but different types.
 // - [X] duplicate labels should trigger a warning 
-// - [ ] the declared type computed questions should match the type of the expression.
+// - [X] the declared type computed questions should match the type of the expression.
 set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
 
@@ -79,20 +78,32 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
       for( <a_loc, _, label, _> <- tenv, <b_loc, _, label, _> <- tenv, a_loc != b_loc, (label notin {""})) {
         msgs += { warning("Duplicate label", a_loc) };
       }
-
+      // declared questions with the same name but different types
+      for (<a_loc, name, _, Type t1> <- tenv, <b_loc, name, _, Type t2> <- tenv, a_loc != b_loc, t1 != t2) {
+        msgs += { error("Same question with different type", a_loc) };
+      }
       // check computed type matches declared type
       if (typeOf(expr, tenv, useDef) != convertType(qtype)) {
         msgs += { error("Computed type does not match declared type", id.src) };
       }
     }
+    case ifQuestion(AExpr expr, list[AQuestion] _): {
+      // for this question match the type of the expression to boolean
+      if (typeOf(expr, tenv, useDef) != tbool()) {
+        msgs += { error("If-expression does not match boolean type", expr.src) };
+      }
+    }
+    case ifElseQuestion(AExpr expr, list[AQuestion] _, list[AQuestion] _): {
+      // for this question match the type of the expression to boolean
+      if (typeOf(expr, tenv, useDef) != tbool()) {
+        msgs += { error("If-expression does not match boolean type", expr.src) };
+      }
+    }
     default: { println("default"); }
   }
 
-
-
-  // check for type compatibility between declared type and expression type
-
   // check each expression
+  // tobias: is this too general? i mean atleast we cover all possible expressions
   for (/AExpr expr <- q) {
     msgs += check(expr, tenv, useDef);
   }
@@ -108,10 +119,97 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
   set[Message] msgs = {};
 
   switch (e) {
-    case ref(AId x):
+    case ref(AId x): {
       msgs += { error("Undeclared question", x.src) | useDef[x.src] == {} };
-
-    // etc.
+    }
+    case intLit(_): { ; }
+    case strLit(_): { ; }
+    case boolLit(_): { ; }
+    case add(lhs, rhs): { 
+      if (typeOf(lhs, tenv, useDef) != tint()) {
+        msgs += { error("Addition operands must be of type int", lhs.src) };
+      }
+      if (typeOf(rhs, tenv, useDef) != tint()) {
+        msgs += { error("Addition operands must be of type int", rhs.src) };
+      }
+     }
+    case sub(lhs, rhs):{ 
+      if (typeOf(lhs, tenv, useDef) != tint()) {
+        msgs += { error("Subtraction operands must be of type int", lhs.src) };
+      }
+      if (typeOf(rhs, tenv, useDef) != tint()) {
+        msgs += { error("Subtraction operands must be of type int", rhs.src) };
+      }
+     }
+    case mul(lhs, rhs):{ 
+      if (typeOf(lhs, tenv, useDef) != tint()) {
+        msgs += { error("Multiplication operands must be of type int", lhs.src) };
+      }
+      if (typeOf(rhs, tenv, useDef) != tint()) {
+        msgs += { error("Multiplication operands must be of type int", rhs.src) };
+      }
+     }
+    case div(lhs, rhs):{ 
+      if (typeOf(lhs, tenv, useDef) != tint()) {
+        msgs += { error("Division numerator must be of type int", lhs.src) };
+      }
+      if (typeOf(rhs, tenv, useDef) != tint()) {
+        msgs += { error("Division denumerator must be of type int", rhs.src) };
+      }
+     }
+    case eq(lhs, rhs): { 
+      //arithmetic equality and logical equality
+      left_t = typeOf(lhs, tenv, useDef);
+      right_t = typeOf(rhs, tenv, useDef);
+      if (left_t != right_t) {
+        // error for both locations
+        msgs += { error("Equality operands must be of same type", lhs.src) };
+        msgs += { error("Equality operands must be of same type", rhs.src) };
+      }
+    }
+    case neq(lhs, rhs): { 
+      //arithmetic equality and logical equality
+      left_t = typeOf(lhs, tenv, useDef);
+      right_t = typeOf(rhs, tenv, useDef);
+      if (left_t != right_t) {
+        // error for both locations
+        msgs += { error("Inequality operands must be of same type", lhs.src) };
+        msgs += { error("Inequality operands must be of same type", rhs.src) };
+      }
+    }
+    case lt(lhs, rhs): { 
+      if (typeOf(lhs, tenv, useDef) != tint()) {
+        msgs += { error("Less than operands must be of type int", lhs.src) };
+      }
+      if (typeOf(rhs, tenv, useDef) != tint()) {
+        msgs += { error("Less than operands must be of type int", rhs.src) };
+      }
+     }
+    case lte(lhs, rhs): { 
+      if (typeOf(lhs, tenv, useDef) != tint()) {
+        msgs += { error("Less than or equal to operands must be of type int", lhs.src) };
+      }
+      if (typeOf(rhs, tenv, useDef) != tint()) {
+        msgs += { error("Less than or equal to operands must be of type int", rhs.src) };
+      }
+    }
+    case gt(lhs, rhs): { 
+      if (typeOf(lhs, tenv, useDef) != tint()) {
+        msgs += { error("Greater than operands must be of type int", lhs.src) };
+      }
+      if (typeOf(rhs, tenv, useDef) != tint()) {
+        msgs += { error("Greater than operands must be of type int", rhs.src) };
+      }
+    }
+    case gte(lhs, rhs): { 
+      if (typeOf(lhs, tenv, useDef) != tint()) {
+        msgs += { error("Greater than or equal to operands must be of type int", lhs.src) };
+      }
+      if (typeOf(rhs, tenv, useDef) != tint()) {
+        msgs += { error("Greater than or equal to operands must be of type int", rhs.src) };
+      }
+    }
+    default: { println("check(AExpr...): SUS DEBUG LOG! default case hit where it makes no sense ??? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"); }
   }
   
   return msgs; 
@@ -119,7 +217,8 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 
 Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
   switch (e) {
-    case ref(id(_, src = loc u)):  
+    case ref(id(_, src = loc u)):
+      // lookup reference type  
       if (<u, loc d> <- useDef, <d, x, _, Type t> <- tenv) {
         return t;
       }
@@ -136,9 +235,8 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
     case lte(lhs, rhs): return tbool();
     case gt(lhs, rhs): return tbool();
     case gte(lhs, rhs): return tbool();
-    default: return tunknown();
   }
-  
+
   return tunknown(); 
 }
 

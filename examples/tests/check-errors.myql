@@ -31,7 +31,16 @@ form taxOfficeExample {
 
   "Wrong type 3"
     q5: string = false
-   
+
+  "Q int type"
+    q_int: integer = 100
+  
+  if(q_int) {
+
+  }
+
+  "undlecared var"
+    q_err_undecl: integer = (err_unkn_var - q_int) * 50
   
   if (hasSodHouse) {
     "What was the selling price?"
