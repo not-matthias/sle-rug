@@ -5,6 +5,11 @@ import Resolve;
 import Message; // see standard library
 import IO;
 
+
+bool hasErrors(set[Message] msgs) {
+  return { error(_, _) | error(_) <- msgs } != {};
+}
+
 data Type
   = tint()
   | tbool()

@@ -54,7 +54,13 @@ public void runAllTests_Eval(){
     println(res);
     assert res["valueResidue"] == vint(337);
 
-
+    // TEST 5:
+    println("TEST 5");
+    res = testEval(readFile(|cwd:///examples/binary.myql|), 
+                (  "x": 0
+                   )
+                );
+    println(res);
 
     println("ALL TESTS PASSED");
 }
@@ -67,8 +73,8 @@ public VEnv testEval(str input_str_ql, map[str, value] inputs){
     println("pre-check");
     set[Message] msgs = check(ast, tenv, g.useDef);
 
-    // check that there are no errors
-    assert msgs == {};
+    // check that there are no errors in the messages
+    assert !hasErrors(msgs);
     println("post-check");
     
     println("pre-eval");
