@@ -54,13 +54,33 @@ public void runAllTests_Eval(){
     println(res);
     assert res["valueResidue"] == vint(337);
 
-    // TEST 5:
+
+    // BINARY TESTS
     println("TEST 5");
     res = testEval(readFile(|cwd:///examples/binary.myql|), 
-                (  "x": 0
+                (  "x_1_10": true,
+                     "x_1_5": true,
+                     "x_1_3": true,
+                     "x_1_2": true
                    )
                 );
     println(res);
+    assert res["answer_1_2"] == vint(1);
+    assert res["answer_2_3"] == vint(0);
+
+
+    println("TEST 6");
+    res = testEval(readFile(|cwd:///examples/binary.myql|), 
+                (  "x_1_10": true,
+                     "x_1_5": true,
+                     "x_1_3": true,
+                     "x_1_2": false
+                   )
+                );
+    println(res);
+    assert res["answer_1_2"] == vint(0);
+    assert res["answer_2_3"] == vint(2);
+     
 
     println("ALL TESTS PASSED");
 }

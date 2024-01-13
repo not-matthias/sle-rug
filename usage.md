@@ -26,3 +26,17 @@ import TestCheck;
 
 runAllTests();
 ```
+
+Add the following to vscode config if errors and hints are not shown: 
+
+```json
+// settings.json
+    "[parametric-rascalmpl]": {
+        
+        "editor.colorDecorators": true,
+        "editor.semanticHighlighting.enabled": true,
+        "editor.showUnused": true,
+        "editor.showDeprecated": true
+
+    }
+```
