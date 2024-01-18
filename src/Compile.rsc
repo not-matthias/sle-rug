@@ -95,9 +95,9 @@ str expr2str(AExpr expr) {
     case div(lhs, rhs): return (expr2str(lhs) + " / " + expr2str(rhs));
     case eq(lhs, rhs): return  (expr2str(lhs) + " == " + expr2str(rhs));
     case neq(lhs, rhs): return (expr2str(lhs) + " != " + expr2str(rhs));
-    case lt(lhs, rhs): return  (expr2str(lhs) + " < " + expr2str(rhs));
-    case lte(lhs, rhs): return (expr2str(lhs) + " <= " + expr2str(rhs));
-    case gt(lhs, rhs): return  (expr2str(lhs) + " > " + expr2str(rhs));
+    case lt(lhs, rhs): return  (expr2str(lhs) + " \< " + expr2str(rhs));
+    case lte(lhs, rhs): return (expr2str(lhs) + " \<= " + expr2str(rhs));
+    case gt(lhs, rhs): return  (expr2str(lhs) + " \> " + expr2str(rhs));
     case gte(lhs, rhs): return (expr2str(lhs) + " \>= " + expr2str(rhs));
     default: throw "Unhandled expr <expr>";
   }
@@ -159,11 +159,11 @@ str default_value(AType qtype) {
   }
 }
 
-str extract_value(AType qtype) {
+str parse_value(AType qtype, str code) {
   switch (qtype) {
-    case integer(): return "parseInt(input.value)";
-    case boolean(): return "input.checked";
-    case string(): return  "parseFloat(input.value)"; // TODO: What to do here?
+    case integer(): return "parseInt(<code>)";
+    case boolean(): return "<code>";
+    case string(): return  "parseFloat(<code>)"; // TODO: What to do here?
     default: return "UNREACHABLE";
   }
 }
@@ -179,13 +179,15 @@ str set_value(AType qtype) {
 
 str question2js(AQuestion q, UseDef useDef, AForm f) {
   if (q is question) {
-    str funName = "onClick_<q.id.name>";
-    str varName = q.id.name;
+    str inputId = q.id.name;
+    str funName = "onClick_<inputId>";
+    str varName = inputId;
+    str field = (q.qtype is boolean) ? "input.checked" : "input.value";
 
     str content = "";
-    content += "var <varName> = <default_value(q.qtype)>;";
+    content += "let <varName> = <default_value(q.qtype)>;";
     content += "function <funName> (input) {";
-    content += "<varName> = <extract_value(q.qtype)>;";
+    content += "<varName> = <parse_value(q.qtype, field)>;";
     content += "console.log(<varName>);";
     content += call_event_handlers(q, useDef, f);
     content += "}";
@@ -202,7 +204,7 @@ str question2js(AQuestion q, UseDef useDef, AForm f) {
 
     str content = "";
     content += "function <funName>() {";
-    content += "var <varName> = document.querySelector(\"#<inputId>\");";
+    content += "let <varName> = document.querySelector(\"#<inputId>\");";
     content += "<varName>.<field> = <expr2str(q.expr)>;";
     content += "console.log(<varName>);";
     content += "}";
@@ -213,14 +215,24 @@ str question2js(AQuestion q, UseDef useDef, AForm f) {
   return "";
 }
 
+str showOrHideQuestion(AQuestion q, bool show) {
+  str displayValue = show ? "block" : "none";
+  str element = "document.querySelector(\"#div_<q.id.name>\")";
+  return "<element>.style.display = \"<displayValue>\";";
+}
 
 str showOrHideQuestions(list[AQuestion] questions, bool show) {
-    str displayValue = show ? "block" : "none";
+    str code = "";
+    for (AQuestion q <- questions, q is question || q is calculatedQuestion) {
+      code += showOrHideQuestion(q, show);
+    }
+    return code;
+}
 
+str showOrHideAllQuestions(list[AQuestion] questions, bool show) {
     str code = "";
     for (/AQuestion q <- questions, q is question || q is calculatedQuestion) {
-      str element = "document.querySelector(\"#div_<q.id.name>\")";
-      code += "<element>.style.display = \"<displayValue>\";";
+      code += showOrHideQuestion(q, show);
     }
     return code;
 }
@@ -229,21 +241,22 @@ str condQuestion2js(AForm f) {
   str content = "";
 
   content += "function update_conditions() {";
+  content += "console.log(\"updating conditions\");";
   for(/AQuestion q <- f) {
     if (q is ifQuestion) {
       content += "if (<expr2str(q.expr)>) {";
       content += showOrHideQuestions(q.ifQuestions, true);
       content += "} else {";
-      content += showOrHideQuestions(q.ifQuestions, false);
+      content += showOrHideAllQuestions(q.ifQuestions, false);
       content += "}";
     }
 
     if (q is ifElseQuestion) {
       content += "if (<expr2str(q.expr)>) {";
       content += showOrHideQuestions(q.ifQuestions, true);
-      content += showOrHideQuestions(q.elseQuestions, false);
+      content += showOrHideAllQuestions(q.elseQuestions, false);
       content += "} else {";
-      content += showOrHideQuestions(q.ifQuestions, false);
+      content += showOrHideAllQuestions(q.ifQuestions, false);
       content += showOrHideQuestions(q.elseQuestions, true);
       content += "}";
     }
