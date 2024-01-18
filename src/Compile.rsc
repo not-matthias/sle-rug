@@ -125,7 +125,7 @@ HTMLElement input2html(AQuestion q) {
     i.disabled = "true";
   }
 
-  return input;
+  return i;
 }
 
 // Javascript related code
