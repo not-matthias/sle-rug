@@ -95,14 +95,15 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
     case ifQuestion(AExpr expr, list[AQuestion] _): {
       // for this question match the type of the expression to boolean
       e_t = typeOf(expr, tenv, useDef);
-      if (typeOf(expr, tenv, useDef) != tbool()) {
+      if (e_t != tbool()) {
         msgs += { error("If-expression type does not match boolean type got: <e_t>", expr.src) };
       }
     }
     case ifElseQuestion(AExpr expr, list[AQuestion] _, list[AQuestion] _): {
       // for this question match the type of the expression to boolean
-      if (typeOf(expr, tenv, useDef) != tbool()) {
-        msgs += { error("If-else-expression does not match boolean type", expr.src) };
+      e_t = typeOf(expr, tenv, useDef);
+      if (e_t != tbool()) {
+        msgs += { error("If-else-expression does not match boolean type <e_t>", expr.src) };
       }
     }
     default: { println("default"); }
@@ -235,7 +236,11 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
     case sub(lhs, rhs): return tint();
     case mul(lhs, rhs): return tint();
     case div(lhs, rhs): return tint();
-    case eq(lhs, rhs): return tbool();
+    // BOOLEAN
+    case and(lhs, rhs): return tbool();
+    case or(lhs, rhs): return tbool();
+    case not(lhs): return tbool();
+    case equal(lhs, rhs): return tbool();
     case neq(lhs, rhs): return tbool();
     case lt(lhs, rhs): return tbool();
     case lte(lhs, rhs): return tbool();

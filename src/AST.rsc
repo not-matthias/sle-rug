@@ -29,16 +29,16 @@ data AExpr(loc src = |tmp:///|)
   | sub(AExpr left, AExpr right)
   | mul(AExpr left, AExpr right)
   | div(AExpr left, AExpr right)
+  // BOOLEAN
+  | not(AExpr expr)
+  | and(AExpr left, AExpr right)
+  | or(AExpr left, AExpr right)
+  | equal(AExpr left, AExpr right)
+  | neq(AExpr left, AExpr right)
   | lt(AExpr left, AExpr right)
   | lte(AExpr left, AExpr right)
   | gt(AExpr left, AExpr right)
   | gte(AExpr left, AExpr right)
-  
-  | eq(AExpr left, AExpr right)
-  | neq(AExpr left, AExpr right)
-  | and(AExpr left, AExpr right)
-  | or(AExpr left, AExpr right)
-  | not(AExpr expr)
   ;
 
 data AId(loc src = |tmp:///|)

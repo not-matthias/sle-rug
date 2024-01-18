@@ -65,15 +65,9 @@ AExpr cst2ast(Expr e) {
     case (Expr)`<Expr e1> \<= <Expr e2>`: return lte(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> \>= <Expr e2>`: return gte(cst2ast(e1), cst2ast(e2), src=e.src);
     // BOOLEAN
-    case (Expr)`<Expr e1> == <Expr e2>`: {
-      println(e1);
-      println(e2);
-      println(cst2ast(e1));
-      println(cst2ast(e2));
-      println(prettyTree(e));
-     
+    case (Expr)`<Expr e1> == <Expr e2>`: {     
       // BUG found: https://www.rascal-mpl.org/docs/Library/Type/#Type-eq
-      return AExpr::eq(cst2ast(e1), cst2ast(e2), src=e.src); 
+      return equal(cst2ast(e1), cst2ast(e2), src=e.src); 
     }
     case (Expr)`<Expr e1> != <Expr e2>`: return neq(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> && <Expr e2>`: return and(cst2ast(e1), cst2ast(e2), src=e.src);
