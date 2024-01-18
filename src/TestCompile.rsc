@@ -14,8 +14,8 @@ import Compile;
 public void runAllTests_Compile(){
     // TEST 1: 
     println("TEST 1");
-    testCompile(readFile(|cwd:///examples/binary.myql|));
-    // testCompile(readFile(|cwd:///examples/tests/compile_simple.myql|));
+    // testCompile(readFile(|cwd:///examples/binary.myql|));
+    testCompile(readFile(|cwd:///examples/tests/compile_simple.myql|));
 }
 
 
