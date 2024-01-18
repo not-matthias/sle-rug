@@ -115,9 +115,9 @@ HTMLElement input2html(AQuestion q) {
   };
 
   str id = q.id.name;
-  str onClick = "onClick_" + q.id.name + "(this)";
+  str onChange = "onChange_" + q.id.name + "(this)";
   
-  HTMLElement input = input(\type = inputType, id = id, onclick = onClick);
+  HTMLElement input = input(\type = inputType, id = id, onchange = onChange);
 
   // Disable if it's a computed question
   if (q is calculatedQuestion) {
@@ -205,7 +205,7 @@ str generate_vars(AForm f) {
 str generate_question(AQuestion q, UseDef useDef, AForm f) {
   if (q is question) {
     str inputId = q.id.name;
-    str funName = "onClick_<inputId>";
+    str funName = "onChange_<inputId>";
     str varName = inputId;
     str field = (q.qtype is boolean) ? "input.checked" : "input.value";
 
