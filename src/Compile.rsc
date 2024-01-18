@@ -30,6 +30,7 @@ void compile(AForm f) {
   writeFile(f.src[extension="html"].top, writeHTMLString(form2html(f)));
 }
 
+
 // HTML related code
 //
 
