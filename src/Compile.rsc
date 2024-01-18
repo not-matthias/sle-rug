@@ -117,7 +117,7 @@ HTMLElement input2html(AQuestion q) {
   str id = q.id.name;
   str onChange = "onChange_" + q.id.name + "(this)";
   
-  HTMLElement input = input(\type = inputType, id = id, onchange = onChange);
+  HTMLElement i = input(\type = inputType, id = id, onchange = onChange);
 
   // Disable if it's a computed question
   if (q is calculatedQuestion) {
