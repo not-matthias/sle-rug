@@ -94,14 +94,15 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
     }
     case ifQuestion(AExpr expr, list[AQuestion] _): {
       // for this question match the type of the expression to boolean
+      e_t = typeOf(expr, tenv, useDef);
       if (typeOf(expr, tenv, useDef) != tbool()) {
-        msgs += { error("If-expression does not match boolean type", expr.src) };
+        msgs += { error("If-expression type does not match boolean type got: <e_t>", expr.src) };
       }
     }
     case ifElseQuestion(AExpr expr, list[AQuestion] _, list[AQuestion] _): {
       // for this question match the type of the expression to boolean
       if (typeOf(expr, tenv, useDef) != tbool()) {
-        msgs += { error("If-expression does not match boolean type", expr.src) };
+        msgs += { error("If-else-expression does not match boolean type", expr.src) };
       }
     }
     default: { println("default"); }

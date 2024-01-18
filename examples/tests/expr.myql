@@ -3,13 +3,13 @@ form taxOfficeExample {
         a: boolean
     
     "Did you enter a loan?"
-        b: integer = 42
+        b: integer = a
 
     "Did you enter a asdf?"
         c: string
 
-    if(a && a && b > 10 && c == "asdf") {
+    if(a && a && b > 10 && true) {
         "How much did you pay for the house?"
-            b: integer = 1
+            b: integer = 1 * a
     }
 }
