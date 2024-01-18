@@ -17,7 +17,12 @@ form flattenExample {
         }
 
         if(c){
-            "How much did you pay for the car?"
+            "f question?"
+            f: integer = 5
+        }
+
+        if(true) {
+            "another f question?"
             f: integer = 5
         }
     }

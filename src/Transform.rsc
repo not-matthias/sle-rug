@@ -83,7 +83,34 @@ list[AQuestion] flatten(AQuestion q, AExpr pre_cond) {
  */
  
 start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
-   return f; 
+   
+   // syntax has src loc
+
+   // https://www.rascal-mpl.org/docs/Rascal/Expressions/Values/Relation/Subscription/
+   // https://www.rascal-mpl.org/docs/Rascal/Expressions/Values/Relation/FieldProjection/
+
+   
+  set[loc] equivClass = { useOrDef };
+
+  bool isDef = useOrDef in useDef<1>; // def has no corresponding def when used  
+  if(isDef) {
+    // add its uses
+    equivClass += { u | <loc u, useOrDef> <- useDef };
+  } else {
+    // add its def
+    if( <useOrDef, loc d> <- useDef) {
+      equivClass += d;
+      equivClass += { u | <loc u, d> <- useDef };
+    }
+  }
+
+  // https://www.rascal-mpl.org/docs/Rascal/Expressions/Visit/
+  updatedTree = visit(f) {
+    case Id x => [Id] newName
+      when x.src in equivClass
+  }
+  
+  return updatedTree; 
 } 
  
  
