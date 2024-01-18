@@ -1,0 +1,29 @@
+form taxOfficeExample { 
+  "Did you buy a house in 2010?"
+    hasBoughtHouse: integer
+    
+  "Did you enter a loan?"
+    hasMaintLoan: integer
+
+  "How are u?"
+    howareu: string
+
+  "asdf?"
+    asdf: boolean
+
+  "asdf2?"
+    asdf: boolean
+
+  "calc question?"
+    asdf: integer = hasBoughtHouse - hasMaintLoan
+
+
+  if (asdf) {
+    "What was the selling price?"
+      sellingPrice: integer
+    "Private debts for the sold house:"
+      privateDebt: integer
+    "Value residue:"
+      valueResidue: integer = sellingPrice - privateDebt
+  }
+}
