@@ -23,12 +23,15 @@ import util::Math;
  */
 
 void compile(AForm f) {
-  writeFile(|cwd:///out.html|, writeHTMLString(form2html(f)));
-  writeFile(|cwd:///out.js|, form2js(f));
+  // writeFile(|cwd:///out.html|, writeHTMLString(form2html(f)));
+  // writeFile(|cwd:///out.js|, form2js(f));
 
-  // writeFile(f.src[extension="js"].top, form2js(f));
-  // writeFile(f.src[extension="html"].top, writeHTMLString(form2html(f)));
+  writeFile(f.src[extension="js"].top, form2js(f));
+  writeFile(f.src[extension="html"].top, writeHTMLString(form2html(f)));
 }
+
+// HTML related code
+//
 
 HTMLElement form2html(AForm f) {
   HTMLElement script = script([]);
@@ -175,7 +178,7 @@ str parse_value(AType qtype, str code) {
 
 str set_value(AType qtype) {
    switch (qtype) {
-    case integer(): return "ixnput.value = ";
+    case integer(): return "input.value = ";
     case boolean(): return "input.checked = ";
     case string(): return  "input.value =";
     default: return "UNREACHABLE";
