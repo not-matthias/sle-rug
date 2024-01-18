@@ -33,6 +33,7 @@ syntax Expr
   | Bool
   | "(" Expr ")"
 
+
   // Arithmetic operators
   > left (
     Expr a "*" Expr b

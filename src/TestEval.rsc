@@ -7,7 +7,7 @@ import CST2AST;
 import IO;
 import Check;
 import Resolve;
-
+import vis::Text;
 import Eval;
 
 public void runAllTests_Eval(){
@@ -80,9 +80,20 @@ public void runAllTests_Eval(){
     println(res);
     assert res["answer_1_2"] == vint(0);
     assert res["answer_2_3"] == vint(2);
-     
 
-    println("ALL TESTS PASSED");
+
+   println("TEST 7");
+   res = testEval(readFile(|cwd:///examples/tests/expr.myql|), 
+                (  "a": true,
+                   "c": "asdf"
+                )
+                );
+   
+   assert res["b"] == vint(1);
+   assert res["a"] == vbool(true);
+   assert res["c"] == vstr("asdf");
+
+   println("ALL TESTS PASSED");
 }
 
 public VEnv testEval(str input_str_ql, map[str, value] inputs){

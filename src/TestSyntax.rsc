@@ -11,6 +11,14 @@ public void runAllTests(){
     println(t);
     println("Pretty Tree: ");
     println(prettyTree(t));
+
+
+    fileContent = readFile(|cwd:///examples/tests/expr.myql|);
+    t = testSimple(fileContent);
+    println("Tree: ");
+    println(t);
+    println("Pretty Tree: ");
+    println(prettyTree(t));
 }
 
 public Tree testSimple(str input){

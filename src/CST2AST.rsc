@@ -5,7 +5,7 @@ import AST;
 import ParseTree;
 import String;
 import Boolean;
-
+import vis::Text;
 import IO; //for println
 
 /*
@@ -64,6 +64,19 @@ AExpr cst2ast(Expr e) {
     case (Expr)`<Expr e1> \> <Expr e2>`: return gt(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> \<= <Expr e2>`: return lte(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> \>= <Expr e2>`: return gte(cst2ast(e1), cst2ast(e2), src=e.src);
+    // BOOLEAN
+    case (Expr)`<Expr e1> == <Expr e2>`: {
+      println(e1);
+      println(e2);
+      println(cst2ast(e1));
+      println(cst2ast(e2));
+      println(prettyTree(e));
+    
+      return eq(cst2ast(e1), cst2ast(e2), src=e.src); 
+    }
+    case (Expr)`<Expr e1> != <Expr e2>`: return neq(cst2ast(e1), cst2ast(e2), src=e.src);
+    case (Expr)`<Expr e1> && <Expr e2>`: return and(cst2ast(e1), cst2ast(e2), src=e.src);
+    case (Expr)`<Expr e1> || <Expr e2>`: return or(cst2ast(e1), cst2ast(e2), src=e.src);
     default: throw "Unhandled expression: <e>";
   }
 }

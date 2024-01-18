@@ -3,6 +3,7 @@ module Eval
 import AST;
 import Resolve;
 import IO;
+import vis::Text;
 
 /*
  * Implement big-step semantics for QL
@@ -141,13 +142,15 @@ Value eval(AExpr e, VEnv venv) {
     case sub(AExpr left, AExpr right): return vint(eval(left, venv).n - eval(right, venv).n);
     case mul(AExpr left, AExpr right): return vint(eval(left, venv).n * eval(right, venv).n);
     case div(AExpr left, AExpr right): return vint(eval(left, venv).n / eval(right, venv).n);
-    case eq(AExpr left, AExpr right): return vbool(eval(left, venv).n == eval(right, venv).n);
-    case neq(AExpr left, AExpr right): return vbool(eval(left, venv).n != eval(right, venv).n);
-
     case lt(AExpr left, AExpr right): return vbool(eval(left, venv).n < eval(right, venv).n);
     case lte(AExpr left, AExpr right): return vbool(eval(left, venv).n <= eval(right, venv).n);
     case gt(AExpr left, AExpr right): return vbool(eval(left, venv).n > eval(right, venv).n);
     case gte(AExpr left, AExpr right): return vbool(eval(left, venv).n >= eval(right, venv).n);
+    // BOOLEAN
+    case eq(AExpr left, AExpr right): return vbool(eval(left, venv).n == eval(right, venv).n);
+    case neq(AExpr left, AExpr right): return vbool(eval(left, venv).n != eval(right, venv).n);
+    case and(AExpr left, AExpr right): return vbool(eval(left, venv).b && eval(right, venv).b);
+    case or(AExpr left, AExpr right): return vbool(eval(left, venv).b || eval(right, venv).b);
 
     // etc.
     

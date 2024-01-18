@@ -29,7 +29,16 @@ import AST;
  */
  
 AForm flatten(AForm f) {
+  for(q <- f.questions){
+    
+    flatten(q, boolLit(true));
+  }
+  
   return f; 
+}
+
+AQuestion flatten(AQuestion q, AExpr pre_cond) {
+  return q; 
 }
 
 /* Rename refactoring:
