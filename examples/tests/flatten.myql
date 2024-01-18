@@ -21,7 +21,7 @@ form flattenExample {
             f: integer = 5
         }
 
-        if(true) {
+        if(true && a) {
             "another f question?"
             f: integer = 5
         }

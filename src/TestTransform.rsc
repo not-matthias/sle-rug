@@ -5,17 +5,26 @@ import ParseTree;
 import AST;
 import CST2AST;
 import IO;
-
+import Resolve;
+import vis::Text; //prettyTree
 import Transform;
 
 public void runAllTests_Transform(){
-    AForm t = testSimple(readFile(|cwd:///examples/tests/flatten.myql|));
-    println("AForm: ");
-    println(t);
-    
-    AForm flat = flatten(t);
+    t = parse(#start[Form], readFile(|cwd:///examples/tests/flatten.myql|));
+     
+    AForm flat = flatten(cst2ast(t));
     printFlattened(flat);
 
+
+    t = parse(#start[Form], readFile(|cwd:///examples/tests/flatten.myql|));
+
+    a_loc_use = |unknown:///|(121,1,<11,7>,<11,8>);
+    
+    print(prettyTree(t));
+
+    start[Form] renamed = rename(t, a_loc_use, "A", resolve(flat).useDef);
+
+    print(prettyTree(renamed));
 }
 
 void printFlattened(AForm flat){

@@ -4,6 +4,7 @@ import Syntax;
 import Resolve;
 import AST;
 import IO;
+import ParseTree;
 
 /* 
  * Transforming QL forms
@@ -98,7 +99,7 @@ start[Form] rename(start[Form] f, loc useOrDef, str newName, UseDef useDef) {
     equivClass += { u | <loc u, useOrDef> <- useDef };
   } else {
     // add its def
-    if( <useOrDef, loc d> <- useDef) {
+    if( <useOrDef, loc d> <- useDef) {
       equivClass += d;
       equivClass += { u | <loc u, d> <- useDef };
     }
