@@ -121,7 +121,7 @@ HTMLElement input2html(AQuestion q) {
 
   // Disable if it's a computed question
   if (q is calculatedQuestion) {
-    input.disabled = "true";
+    i.disabled = "true";
   }
 
   return input;

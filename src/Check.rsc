@@ -247,7 +247,7 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
     case gt(lhs, rhs): return tbool();
     case gte(lhs, rhs): return tbool();
   }
-
+  println("typeOf default case hit! <e>");
   return tunknown(); 
 }
 
