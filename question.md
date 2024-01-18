@@ -1,0 +1,2 @@
+- Can we do eval with expr2str? or should we use eval from the previous week? 
+- 
