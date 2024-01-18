@@ -3,6 +3,7 @@ module Transform
 import Syntax;
 import Resolve;
 import AST;
+import IO;
 
 /* 
  * Transforming QL forms
@@ -29,16 +30,49 @@ import AST;
  */
  
 AForm flatten(AForm f) {
+  AForm flat = form(f.name, []);
   for(q <- f.questions){
-    
-    flatten(q, boolLit(true));
+    flat.questions += flatten(q, boolLit(true));
   }
   
-  return f; 
+  return flat; 
 }
 
-AQuestion flatten(AQuestion q, AExpr pre_cond) {
-  return q; 
+list[AQuestion] flatten(AQuestion q, AExpr pre_cond) {
+  switch(q){
+    case question(id(name), _, _): {
+      // BASE CASE
+      AQuestion res = ifQuestion(pre_cond, [q]);
+      //println("Flatten result <name>: <res.expr>");
+      return [res];
+    }
+    case calculatedQuestion(id(name), _, _, _): {
+      // BASE CASE
+      AQuestion res = ifQuestion(pre_cond, [q]);
+      //println("Flatten result <name>: <res.expr>");
+      return [res];
+    }
+    case ifQuestion(AExpr e, list[AQuestion] qs): {
+      // RECURSIVE CASE 
+      list[AQuestion] res = [];
+      for(x <- qs){
+        res += flatten(x, and(pre_cond, e));
+      }
+      return res;
+    }
+    case ifElseQuestion(AExpr e, list[AQuestion] qs1, list[AQuestion] qs2): {
+      // RECURSIVE CASE
+      list[AQuestion] res = [];
+      for(x <- qs1){
+        res += flatten(x, and(pre_cond, e));
+      }
+      for(x <- qs2){
+        res += flatten(x, and(pre_cond, not(e)));
+      }
+      return res;
+    }
+  }
+  throw "Unreachable flatten case: <q>"; 
 }
 
 /* Rename refactoring:

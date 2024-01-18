@@ -1,0 +1,24 @@
+form flattenExample { 
+    "Q1"
+        a: boolean
+    
+    "Q2"
+        b: boolean
+
+    "Q3"
+        c: boolean
+
+    if(a) {
+        "How much did you pay for the house?"
+            d: integer = 3
+        if(b) {
+            "How much did you pay for the car?"
+            e: integer = 4
+        }
+
+        if(c){
+            "How much did you pay for the car?"
+            f: integer = 5
+        }
+    }
+}
