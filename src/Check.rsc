@@ -164,7 +164,7 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
         msgs += { error("Division denumerator must be of type int", rhs.src) };
       }
      }
-    case eq(lhs, rhs): { 
+    case equal(lhs, rhs): { 
       //arithmetic equality and logical equality
       left_t = typeOf(lhs, tenv, useDef);
       right_t = typeOf(rhs, tenv, useDef);

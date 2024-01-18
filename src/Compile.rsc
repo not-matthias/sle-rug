@@ -34,12 +34,12 @@ void compile(AForm f) {
 //
 
 HTMLElement form2html(AForm f) {
-  HTMLElement script = script([]);
-  script.src = "out.js"; // TODO: Fix
+  HTMLElement s = script([]);
+  s.src = "out.js"; // TODO: Fix
 
-  HTMLElement head = head([
+  HTMLElement h = head([
     title([text("QL Form")]),
-    script
+    s
   ]);
 
   // TODO: import js
@@ -96,7 +96,7 @@ str expr2str(AExpr expr) {
     case sub(lhs, rhs): return (expr2str(lhs) + " - " + expr2str(rhs));
     case mul(lhs, rhs): return (expr2str(lhs) + " * " + expr2str(rhs));
     case div(lhs, rhs): return (expr2str(lhs) + " / " + expr2str(rhs));
-    case eq(lhs, rhs): return  (expr2str(lhs) + " == " + expr2str(rhs));
+    case equal(lhs, rhs): return  (expr2str(lhs) + " == " + expr2str(rhs));
     case neq(lhs, rhs): return (expr2str(lhs) + " != " + expr2str(rhs));
     case lt(lhs, rhs): return  (expr2str(lhs) + " \< " + expr2str(rhs));
     case lte(lhs, rhs): return (expr2str(lhs) + " \<= " + expr2str(rhs));
