@@ -23,9 +23,6 @@ import util::Math;
  */
 
 void compile(AForm f) {
-  // writeFile(|cwd:///out.html|, writeHTMLString(form2html(f)));
-  // writeFile(|cwd:///out.js|, form2js(f));
-
   writeFile(f.src[extension="js"].top, form2js(f));
   writeFile(f.src[extension="html"].top, writeHTMLString(form2html(f)));
 }
@@ -34,15 +31,13 @@ void compile(AForm f) {
 //
 
 HTMLElement form2html(AForm f) {
-  HTMLElement s = script([]);
-  s.src = "out.js"; // TODO: Fix
+  HTMLElement scriptSrc = script([]);
+  scriptSrc.src = f.src[extension="js"].file;
 
-  HTMLElement h = head([
-    title([text("QL Form")]),
-    s
+  HTMLElement head = head([
+    title([text(f.name.name)]),
+    scriptSrc
   ]);
-
-  // TODO: import js
 
   list[HTMLElement] questions = [];
   for(AQuestion q <- f.questions) {
@@ -52,7 +47,7 @@ HTMLElement form2html(AForm f) {
   HTMLElement submit = button([text("Submit")]);
   submit.\type = "submit";
 
-  return html([head] + questions + [submit]);
+  return html([head, body([form(questions), submit])]);
 }
 
 HTMLElement question2html (AQuestion q) {
