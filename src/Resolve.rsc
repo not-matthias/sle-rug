@@ -42,11 +42,6 @@ Use uses(AForm f) {
 }
 
 Def defs(AForm f) {
-  // find all definitions of names. 
-  // In QL this is only questions (AQuestion) using AId nodes
-  // This is wrong... i found out in Check
-  // not all AId nodes are definitions, only the ones that are the first child of AQuestion
-  
   Def defs = {};
 
   for (/AQuestion q <- f) {
@@ -55,7 +50,6 @@ Def defs(AForm f) {
         defs += {<id.name, id.src>};
       case calculatedQuestion(AId id, _, _, _):
         defs += {<id.name, id.src>};    
-    // defs += {<id.name, id.src> | /AId id := q}; WRONG
     }
   }
 

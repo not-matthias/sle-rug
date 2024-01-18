@@ -23,15 +23,22 @@ import util::Math;
  */
 
 void compile(AForm f) {
-  // writeFile(f.src[extension="js"].top, form2js(f));
   writeFile(|cwd:///out.html|, writeHTMLString(form2html(f)));
+  writeFile(|cwd:///out.js|, form2js(f));
+
+  // writeFile(f.src[extension="js"].top, form2js(f));
   // writeFile(f.src[extension="html"].top, writeHTMLString(form2html(f)));
 }
 
 HTMLElement form2html(AForm f) {
+  HTMLElement script = script([]);
+  script.src = "out.js"; // TODO: Fix
+
   HTMLElement head = head([
-    title([text("QL Form")])
+    title([text("QL Form")]),
+    script
   ]);
+
   // TODO: import js
 
   list[HTMLElement] questions = [];
@@ -45,34 +52,35 @@ HTMLElement form2html(AForm f) {
   return html([head] + questions + [submit]);
 }
 
-list[HTMLElement] question2html (AQuestion q) {
+HTMLElement question2html (AQuestion q) {
   list[HTMLElement] content = [];
 
   if (q is question || q is calculatedQuestion) {
       content += h3([text(q.label)]);
       content += input2html(q);
       content += br();
-      return content;
-  }
 
-  // q is either ifQuestion or ifElseQuestion
+      return div(content, id = "div_<q.id.name>");
+  }
   
-  str blockStyle = "padding: 30px; border: 2px solid black";
+  if (q is ifQuestion || q is ifElseQuestion) {
+    str blockStyle = "margin: 20px; padding: 10px; border: 2px solid black";
 
-  // If block
-  content += h3([text("if " + expr2str(q.expr) + " {")]);
-  content += [div(question2html(q), style = blockStyle) | AQuestion q <- q.ifQuestions];
+    // If block
+    content += h3([text("if " + expr2str(q.expr) + " {")]);
+    content += div([question2html(q) | AQuestion q <- q.ifQuestions], style = blockStyle);
 
-  // Else block
-  if (q is ifElseQuestion) {
-    content += h3([text("} else {")]);
-    content += [div(question2html(q), style = blockStyle) | AQuestion q <- q.elseQuestions];
+    // Else block
+    if (q is ifElseQuestion) {
+      content += h3([text("} else {")]);
+      content += div([question2html(q) | AQuestion q <- q.elseQuestions], style = blockStyle);
+    }
+
+    // Close the if/else block
+    content += h3([text("}")]);
   }
 
-  // Close the if/else block
-  content += h3([text("}")]);
-
-  return content;
+  return div(content);
 }
 
 str expr2str(AExpr expr) {
@@ -104,7 +112,7 @@ HTMLElement input2html(AQuestion q) {
   };
 
   str id = q.id.name;
-  str onClick = "onClick_" + q.id.name;
+  str onClick = "onClick_" + q.id.name + "(this)";
   
   HTMLElement input = input(\type = inputType, id = id, onclick = onClick);
 
@@ -116,6 +124,150 @@ HTMLElement input2html(AQuestion q) {
   return input;
 }
 
+// Javascript related code
+//
+
+str call_event_handlers(AQuestion q, UseDef useDef, AForm f) {
+  str code = "";
+
+  // Try to find all possible usages of the current value
+  loc qSrc = q.id.src;
+  for (<loc usage, qSrc> <- useDef) {
+
+    // Find the question where the definition came from
+    for (/AQuestion q <- f) {
+      for (/AId id <- q, id.src == usage) {
+        // Call the update handler for computed and conditional questions.
+        if (q is calculatedQuestion) {
+          code += "update_<q.id.name>();";
+        } else if (q is ifQuestion || q is ifElseQuestion) {
+          code += "update_conditions();";
+        }
+      }
+    }
+  }
+
+  return code;
+}
+
+str default_value(AType qtype) {
+  switch (qtype) {
+    case integer(): return "0";
+    case boolean(): return "false";
+    case string(): return "\"\"";
+    default: return "UNREACHABLE";
+  }
+}
+
+str extract_value(AType qtype) {
+  switch (qtype) {
+    case integer(): return "parseInt(input.value)";
+    case boolean(): return "input.checked";
+    case string(): return  "parseFloat(input.value)"; // TODO: What to do here?
+    default: return "UNREACHABLE";
+  }
+}
+
+str set_value(AType qtype) {
+   switch (qtype) {
+    case integer(): return "input.value = ";
+    case boolean(): return "input.checked = ";
+    case string(): return  "input.value =";
+    default: return "UNREACHABLE";
+  }
+}
+
+str question2js(AQuestion q, UseDef useDef, AForm f) {
+  if (q is question) {
+    str funName = "onClick_<q.id.name>";
+    str varName = q.id.name;
+
+    str content = "";
+    content += "var <varName> = <default_value(q.qtype)>;";
+    content += "function <funName> (input) {";
+    content += "<varName> = <extract_value(q.qtype)>;";
+    content += "console.log(<varName>);";
+    content += call_event_handlers(q, useDef, f);
+    content += "}";
+    content += "\n\n";
+
+    return content;
+  }
+
+  if (q is calculatedQuestion) {
+    str inputId = q.id.name;
+    str funName = "update_<inputId>";
+    str varName = "input_<inputId>";
+    str field = (q.qtype is boolean) ? "checked" : "value";
+
+    str content = "";
+    content += "function <funName>() {";
+    content += "var <varName> = document.querySelector(\"#<inputId>\");";
+    content += "<varName>.<field> = <expr2str(q.expr)>;";
+    content += "console.log(<varName>);";
+    content += "}";
+
+    return content;
+  }
+
+  return "";
+}
+
+
+str showOrHideQuestions(list[AQuestion] questions, bool show) {
+    str displayValue = show ? "block" : "none";
+
+    str code = "";
+    for (/AQuestion q <- questions, q is question || q is calculatedQuestion) {
+      str element = "document.querySelector(\"#div_<q.id.name>\")";
+      code += "<element>.style.display = \"<displayValue>\";";
+    }
+    return code;
+}
+
+str condQuestion2js(AForm f) {
+  str content = "";
+
+  content += "function update_conditions() {";
+  for(/AQuestion q <- f) {
+    if (q is ifQuestion) {
+      content += "if (<expr2str(q.expr)>) {";
+      content += showOrHideQuestions(q.ifQuestions, true);
+      content += "} else {";
+      content += showOrHideQuestions(q.ifQuestions, false);
+      content += "}";
+    }
+
+    if (q is ifElseQuestion) {
+      content += "if (<expr2str(q.expr)>) {";
+      content += showOrHideQuestions(q.ifQuestions, true);
+      content += showOrHideQuestions(q.elseQuestions, false);
+      content += "} else {";
+      content += showOrHideQuestions(q.ifQuestions, false);
+      content += showOrHideQuestions(q.elseQuestions, true);
+      content += "}";
+    }
+  }
+  content += "}";
+
+  return content;
+}
+
 str form2js(AForm f) {
-  return "// this is a test";
+
+  str content = "";
+  content += "console.log(\"Loaded script\");";
+  content += condQuestion2js(f);
+
+  RefGraph refGraph = resolve(f);
+  for (/AQuestion q <- f) {
+    content += question2js(q, refGraph.useDef, f);
+  }
+
+  // Generate event handlers
+  // 
+  // if question: call 'update_conditions'
+  // conditional question: find all vars involved. call update_<q.id.name>
+
+  return content;
 }
