@@ -128,7 +128,7 @@ HTMLElement input2html(AQuestion q) {
 //
 
 str call_event_handlers(AQuestion q, UseDef useDef, AForm f) {
-  str code = "";
+  set[str] code = {};
 
   // Try to find all possible usages of the current value
   loc qSrc = q.id.src;
@@ -147,8 +147,13 @@ str call_event_handlers(AQuestion q, UseDef useDef, AForm f) {
     }
   }
 
-  return code;
+  str finalCode = "";
+  for (str c <- code) {
+    finalCode += c;
+  }
+  return finalCode;
 }
+
 
 str default_value(AType qtype) {
   switch (qtype) {
@@ -163,7 +168,7 @@ str parse_value(AType qtype, str code) {
   switch (qtype) {
     case integer(): return "parseInt(<code>)";
     case boolean(): return "<code>";
-    case string(): return  "parseFloat(<code>)"; // TODO: What to do here?
+    case string(): return  "<code>";
     default: return "UNREACHABLE";
   }
 }
@@ -177,7 +182,24 @@ str set_value(AType qtype) {
   }
 }
 
-str question2js(AQuestion q, UseDef useDef, AForm f) {
+
+// Generate all the variables at once, so that we don't get 
+// the error:
+// 
+// 'Uncaught ReferenceError: can't access lexical declaration 'x_3_4' before initialization'
+// 
+str generate_vars(AForm f) {
+  str code = "";
+  
+  for (/AQuestion q <- f, q is question) {
+    str varName = q.id.name;
+    code += "let <varName> = <default_value(q.qtype)>;";
+  }
+
+  return code;
+}
+
+str generate_question(AQuestion q, UseDef useDef, AForm f) {
   if (q is question) {
     str inputId = q.id.name;
     str funName = "onClick_<inputId>";
@@ -185,7 +207,6 @@ str question2js(AQuestion q, UseDef useDef, AForm f) {
     str field = (q.qtype is boolean) ? "input.checked" : "input.value";
 
     str content = "";
-    content += "let <varName> = <default_value(q.qtype)>;";
     content += "function <funName> (input) {";
     content += "<varName> = <parse_value(q.qtype, field)>;";
     content += "console.log(<varName>);";
@@ -209,35 +230,49 @@ str question2js(AQuestion q, UseDef useDef, AForm f) {
     content += "console.log(<varName>);";
     content += "}";
 
+    // Execute the update handler (to initialize the default value) after the DOM was loaded
+    content += "document.addEventListener(\"DOMContentLoaded\", () =\> <funName>());";
+
     return content;
   }
 
   return "";
 }
 
-str showOrHideQuestion(AQuestion q, bool show) {
+str generate_questions(AForm f) {
+  str code = "";
+
+  RefGraph refGraph = resolve(f);
+  for (/AQuestion q <- f) {
+    code += generate_question(q, refGraph.useDef, f);
+  }
+
+  return code;
+}
+
+str display_question(AQuestion q, bool show) {
   str displayValue = show ? "block" : "none";
   str element = "document.querySelector(\"#div_<q.id.name>\")";
   return "<element>.style.display = \"<displayValue>\";";
 }
 
-str showOrHideQuestions(list[AQuestion] questions, bool show) {
+str display_questions(list[AQuestion] questions, bool show) {
     str code = "";
     for (AQuestion q <- questions, q is question || q is calculatedQuestion) {
-      code += showOrHideQuestion(q, show);
+      code += display_question(q, show);
     }
     return code;
 }
 
-str showOrHideAllQuestions(list[AQuestion] questions, bool show) {
+str recursive_display_questions(list[AQuestion] questions, bool show) {
     str code = "";
     for (/AQuestion q <- questions, q is question || q is calculatedQuestion) {
-      code += showOrHideQuestion(q, show);
+      code += display_question(q, show);
     }
     return code;
 }
 
-str condQuestion2js(AForm f) {
+str generate_conditional_questions(AForm f) {
   str content = "";
 
   content += "function update_conditions() {";
@@ -245,19 +280,19 @@ str condQuestion2js(AForm f) {
   for(/AQuestion q <- f) {
     if (q is ifQuestion) {
       content += "if (<expr2str(q.expr)>) {";
-      content += showOrHideQuestions(q.ifQuestions, true);
+      content += display_questions(q.ifQuestions, true);
       content += "} else {";
-      content += showOrHideAllQuestions(q.ifQuestions, false);
+      content += recursive_display_questions(q.ifQuestions, false);
       content += "}";
     }
 
     if (q is ifElseQuestion) {
       content += "if (<expr2str(q.expr)>) {";
-      content += showOrHideQuestions(q.ifQuestions, true);
-      content += showOrHideAllQuestions(q.elseQuestions, false);
+      content += display_questions(q.ifQuestions, true);
+      content += recursive_display_questions(q.elseQuestions, false);
       content += "} else {";
-      content += showOrHideAllQuestions(q.ifQuestions, false);
-      content += showOrHideQuestions(q.elseQuestions, true);
+      content += recursive_display_questions(q.ifQuestions, false);
+      content += display_questions(q.elseQuestions, true);
       content += "}";
     }
   }
@@ -269,12 +304,12 @@ str condQuestion2js(AForm f) {
 str form2js(AForm f) {
   str content = "";
   content += "console.log(\"Loaded script\");";
-  content += condQuestion2js(f);
+  content += generate_vars(f);
+  content += generate_conditional_questions(f);
+  content += generate_questions(f);
 
-  RefGraph refGraph = resolve(f);
-  for (/AQuestion q <- f) {
-    content += question2js(q, refGraph.useDef, f);
-  }
+  // Initialize the conditional questions by calling the update method once the DOM was loaded
+  content += "document.addEventListener(\"DOMContentLoaded\", () =\> update_conditions());";
 
   return content;
 }
