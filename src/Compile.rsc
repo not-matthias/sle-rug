@@ -42,7 +42,7 @@ HTMLElement form2html(AForm f) {
   // TODO: import js
 
   list[HTMLElement] questions = [];
-  for(/AQuestion q <- f) {
+  for(AQuestion q <- f.questions) {
     questions += question2html(q);
   }
 
@@ -170,7 +170,7 @@ str extract_value(AType qtype) {
 
 str set_value(AType qtype) {
    switch (qtype) {
-    case integer(): return "input.value = ";
+    case integer(): return "ixnput.value = ";
     case boolean(): return "input.checked = ";
     case string(): return  "input.value =";
     default: return "UNREACHABLE";
@@ -254,7 +254,6 @@ str condQuestion2js(AForm f) {
 }
 
 str form2js(AForm f) {
-
   str content = "";
   content += "console.log(\"Loaded script\");";
   content += condQuestion2js(f);
@@ -263,11 +262,6 @@ str form2js(AForm f) {
   for (/AQuestion q <- f) {
     content += question2js(q, refGraph.useDef, f);
   }
-
-  // Generate event handlers
-  // 
-  // if question: call 'update_conditions'
-  // conditional question: find all vars involved. call update_<q.id.name>
 
   return content;
 }
