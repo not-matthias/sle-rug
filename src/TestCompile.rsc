@@ -12,14 +12,14 @@ import Resolve;
 import Compile;
 
 public void runAllTests_Compile(){
-    // TEST 1: 
-    println("TEST 1");
-    // testCompile(readFile(|cwd:///examples/binary.myql|));
-    testCompile(readFile(|cwd:///examples/binary.myql|));
+    testCompile(|project://sle-rug/examples/binary.myql|);
+    testCompile(|project://sle-rug/examples/tax.myql|);
+    testCompile(|project://sle-rug/examples/cyclic.myql|);
+    testCompile(|project://sle-rug/examples/empty.myql|);
+    testCompile(|project://sle-rug/examples/errors.myql|);
 }
 
-
-public void testCompile(str input){
+public void testCompile(loc input){
     Tree parsed = parse(#start[Form], input);
     AForm f = cst2ast(parsed);
 
