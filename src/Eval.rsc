@@ -147,6 +147,7 @@ Value eval(AExpr e, VEnv venv) {
     case gt(AExpr left, AExpr right): return vbool(eval(left, venv).n > eval(right, venv).n);
     case gte(AExpr left, AExpr right): return vbool(eval(left, venv).n >= eval(right, venv).n);
     // BOOLEAN
+    // TODO: other cases (string, num, bool)
     case eq(AExpr left, AExpr right): return vbool(eval(left, venv).n == eval(right, venv).n);
     case neq(AExpr left, AExpr right): return vbool(eval(left, venv).n != eval(right, venv).n);
     case and(AExpr left, AExpr right): return vbool(eval(left, venv).b && eval(right, venv).b);
