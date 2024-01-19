@@ -17,6 +17,8 @@ public void runAllTests_Compile(){
     testCompile(|project://sle-rug/examples/cyclic.myql|);
     testCompile(|project://sle-rug/examples/empty.myql|);
     testCompile(|project://sle-rug/examples/errors.myql|);
+    testCompile(|project://sle-rug/examples/tests/compile/boolean_if.myql|);
+    testCompile(|project://sle-rug/examples/tests/compile/compile_simple.myql|);
 
     // TODO: Other tests for all expressions (boolean and math -> conditional)
 }

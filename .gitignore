@@ -17,3 +17,7 @@ devenv.local.nix
 
 .DS_Store
 .vscode
+
+
+**/*.html
+**/*.js
