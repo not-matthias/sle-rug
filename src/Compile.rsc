@@ -92,6 +92,10 @@ str expr2str(AExpr expr) {
     case sub(lhs, rhs): return (expr2str(lhs) + " - " + expr2str(rhs));
     case mul(lhs, rhs): return (expr2str(lhs) + " * " + expr2str(rhs));
     case div(lhs, rhs): return (expr2str(lhs) + " / " + expr2str(rhs));
+    // boolean expressions
+    case not(lhs): return ("!" + expr2str(lhs));
+    case and(lhs, rhs): return (expr2str(lhs) + " && " + expr2str(rhs));
+    case or(lhs, rhs): return (expr2str(lhs) + " || " + expr2str(rhs));
     case equal(lhs, rhs): return  (expr2str(lhs) + " == " + expr2str(rhs));
     case neq(lhs, rhs): return (expr2str(lhs) + " != " + expr2str(rhs));
     case lt(lhs, rhs): return  (expr2str(lhs) + " \< " + expr2str(rhs));
