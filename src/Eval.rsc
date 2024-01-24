@@ -160,10 +160,11 @@ Value eval(AExpr e, VEnv venv) {
       r_val = eval(right, venv);
 
       switch(l_val) {
+        // use rascal ==
         case vint(n): return vbool(n == r_val.n);
         case vbool(b): return vbool(b == r_val.b);
         case vstr(s): return vbool(s == r_val.s);
-        default: throw "Unexpected equal evaluation operand types <e>";
+        default: throw "Unexpected equal evaluation operand types <e>"; // assert bug in implementation
       }
     }
     case neq(AExpr left, AExpr right): {

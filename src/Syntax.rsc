@@ -18,6 +18,7 @@ syntax ConditionalQuestion
   = "if" "(" Expr e ")" "{" Question* ifQuestions "}" "else" "{" Question* elseQuestions "}"
   | "if" "(" Expr e ")" "{" Question* ifQuestions "}";
 
+// indirection tradeoff?
 syntax Question = SimpleQuestion | CalculatedQuestion | ConditionalQuestion;
 
 // TODO: Double check this (use correct associativity)
@@ -47,6 +48,7 @@ syntax Expr
   )
 
   // Boolean operators
+  // no-assoc -> types change
   > left (
     Expr a "\<" Expr b
   | Expr a "\<=" Expr b
