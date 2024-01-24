@@ -7,6 +7,7 @@ import ParseTree;
 import AST;
 import CST2AST;
 import Resolve;
+import Check;
 
 public void runPresentation_Syntax(){
     str fileContent = readFile(|cwd:///examples/present/syntax.myql|);
@@ -47,9 +48,20 @@ public void runPresentation_Resolve(){
 
 public void runPresentation_Check(){
     str fileContent = readFile(|cwd:///examples/present/syntax.myql|);
-    Tree t = parse(#start[Form], fileContent);
-    AForm f = cst2ast(t);
+    Tree cst = parse(#start[Form], fileContent);
+    AForm ast = cst2ast(cst);
     
-    RefGraph rg = resolve(f);
+    RefGraph rg = resolve(ast);
+    TEnv env = collect(ast);
+    println("\nRefGraph.useDef: ");
+    println(rg.useDef);
+
+    println("\nTEnv: ");
+    println(env);
+
+    set[Message] msgs = check(ast, tenv, rg.useDef);
+
+    println("\nMessages: ");
+    println(msgs);
 
 }

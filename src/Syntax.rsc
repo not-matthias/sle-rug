@@ -34,7 +34,6 @@ syntax Expr
   | "(" Expr ")"
 
   // Unary operators
-  
   > right "!" Expr // should this be below the comparison operators?
 
   // Arithmetic operators
