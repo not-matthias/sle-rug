@@ -9,6 +9,7 @@ import CST2AST;
 import Resolve;
 import Check;
 import Eval;
+import Transform;
 
 public void runPresentation_Syntax(){
     str fileContent = readFile(|cwd:///examples/present/syntax.myql|);
@@ -95,6 +96,50 @@ public void runPresentation_Eval() {
         env = eval(ast, i, env);
         print("VEnv after evaluation: ");
         println(env);
+    }
+}
+
+public void runPresentation_Transform(){
+    str fileContent = readFile(|cwd:///examples/present/flatten.myql|);
+    Tree cst = parse(#start[Form], fileContent);
+    AForm ast = cst2ast(cst);
+    println("\n\n ---- FLATTEN TRANSFORM");
+    println("\nAST: ");
+    println(ast);
+    
+    println("\nAST after flatten: ");
+    AForm flat = flatten(cst2ast(cst));
+    printFlattened(flat);
+    
+
+    println("\n\n ---- RENAME TRANSFORM");
+    Tree t = parse(#start[Form], readFile(|cwd:///examples/present/flatten.myql|));
+    println("\nCST: ");
+    println(prettyTree(t));
+    
+    a_loc_use = |unknown:///|(121,1,<11,7>,<11,8>);
+    start[Form] renamed = rename(t, a_loc_use, "A", resolve(flat).useDef);
+    println("\n: CST after rename: ");
+    print(prettyTree(renamed));
+}
+
+void printFlattened(AForm flat){
+    for(AQuestion q <- flat.questions){
+        switch(q){
+            case ifQuestion(AExpr e, list[AQuestion] qs): {
+                switch(qs[0]) {
+                    case question(id(name), _, _): {
+                        println("question <name>: <e>");
+                        continue;
+                    }
+                    case calculatedQuestion(id(name), _, _, _): {
+                        println("question <name>: <e>");
+                        continue;
+                    }
+                }
+                throw "Unexpected question type, inner should be question";
+            }
+        }
     }
 
 }
