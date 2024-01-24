@@ -1,0 +1,12 @@
+form x_in_two_blocks { 
+  "Use x in if block?"
+    useIf: boolean
+    
+  if (useIf) {
+    "What's x in if?"
+      x: integer
+  } else {
+    "What's x in else?"
+      x: integer
+  }
+}
