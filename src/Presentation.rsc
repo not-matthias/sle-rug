@@ -9,6 +9,7 @@ import CST2AST;
 import Resolve;
 import Check;
 import Eval;
+import Compile;
 
 public void runPresentation_Syntax(){
     str fileContent = readFile(|cwd:///examples/present/syntax.myql|);
@@ -67,7 +68,6 @@ public void runPresentation_Check(){
 
 }
 
-
 public void runPresentation_Eval() {
     str fileContent = readFile(|cwd:///examples/present/syntax.myql|);
     Tree cst = parse(#start[Form], fileContent);
@@ -97,4 +97,17 @@ public void runPresentation_Eval() {
         println(env);
     }
 
+}
+
+
+public void runPresentation_Compile() {
+     Tree parsed = parse(#start[Form], |project://sle-rug/examples/present/compile.myql|);
+    AForm f = cst2ast(parsed);
+    RefGraph g = resolve(f);
+    TEnv tenv = collect(f);
+
+    set[Message] msgs = check(f, tenv, g.useDef);
+    assert !hasErrors(msgs);
+
+    compile(f);
 }
