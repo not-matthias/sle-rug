@@ -59,7 +59,7 @@ public void runPresentation_Check(){
     println("\nTEnv: ");
     println(env);
 
-    set[Message] msgs = check(ast, tenv, rg.useDef);
+    set[Message] msgs = check(ast, env, rg.useDef);
 
     println("\nMessages: ");
     println(msgs);
