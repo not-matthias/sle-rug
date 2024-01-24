@@ -8,6 +8,7 @@ import AST;
 import CST2AST;
 import Resolve;
 import Check;
+import Eval;
 
 public void runPresentation_Syntax(){
     str fileContent = readFile(|cwd:///examples/present/syntax.myql|);
@@ -63,5 +64,37 @@ public void runPresentation_Check(){
 
     println("\nMessages: ");
     println(msgs);
+
+}
+
+
+public void runPresentation_Eval() {
+    str fileContent = readFile(|cwd:///examples/present/syntax.myql|);
+    Tree cst = parse(#start[Form], fileContent);
+    AForm ast = cst2ast(cst);
+    RefGraph rg = resolve(ast);
+    TEnv tenv = collect(ast);
+    set[Message] msgs = check(ast, tenv, rg.useDef);
+    assert !hasErrors(msgs);
+
+    
+    VEnv env = initialEnv(ast);
+    print("Initial VEnv: ");
+    println(env);
+
+    // map
+    inputs = ( "hasMaintLoan": true,
+               "maintLoanAmount": 1000
+            );
+
+    // evaluate inputs
+    for(k <- inputs) {
+        Input i = input(k, Value_from_value(inputs[k]));
+        print("evaluating input: ");
+        println(i);
+        env = eval(ast, i, env);
+        print("VEnv after evaluation: ");
+        println(env);
+    }
 
 }
