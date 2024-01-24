@@ -1,8 +1,0 @@
-rascal>/[\w\d\s_?]*/ := "this is a test"
-bool: true
-
-rascal>/[\w\d\s_?]*/ := "this is a test?"
-bool: true
-
-rascal>/[\"][\w\d\s_?]*[\"]/ := "\"Did you enter a loan\""
-bool: true

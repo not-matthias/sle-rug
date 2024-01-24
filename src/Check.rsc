@@ -25,7 +25,6 @@ alias TEnv = rel[loc def, str name, str label, Type \type];
 TEnv collect(AForm f) {
   TEnv tenv = {};
   
-
   visit (f) {
     case question(id, label, ty):
       tenv += { <id.src, id.name, label, convertType(ty)> };
@@ -257,7 +256,7 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
         msgs += { error("Greater than or equal to operands must be of type int", rhs.src) };
       }
     }
-    default: { println("check(AExpr...): SUS DEBUG LOG! default case hit where it makes no sense ??? !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"); }
+    default: { println("check(AExpr...): default case hit"); }
   }
   
   return msgs; 
