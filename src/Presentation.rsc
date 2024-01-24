@@ -10,6 +10,7 @@ import Resolve;
 import Check;
 import Eval;
 import Transform;
+import Compile;
 
 public void runPresentation_Syntax(){
     str fileContent = readFile(|cwd:///examples/present/syntax.myql|);
@@ -67,7 +68,6 @@ public void runPresentation_Check(){
     println(msgs);
 
 }
-
 
 public void runPresentation_Eval() {
     str fileContent = readFile(|cwd:///examples/present/syntax.myql|);
@@ -142,4 +142,17 @@ void printFlattened(AForm flat){
         }
     }
 
+}
+
+
+public void runPresentation_Compile() {
+     Tree parsed = parse(#start[Form], |project://sle-rug/examples/present/compile.myql|);
+    AForm f = cst2ast(parsed);
+    RefGraph g = resolve(f);
+    TEnv tenv = collect(f);
+
+    set[Message] msgs = check(f, tenv, g.useDef);
+    assert !hasErrors(msgs);
+
+    compile(f);
 }
