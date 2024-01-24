@@ -83,21 +83,26 @@ public void runAllTests_Eval(){
 
 
    println("TEST 7");
-   res = testEval(readFile(|cwd:///examples/tests/expr.myql|), 
-                (  "a": true,
-                   "c": "asdf"
-                )
+   res = testEval(readFile(|cwd:///examples/tests/eval_expr.myql|), 
+                (  "a": true
+                ),
+                  debugCST = true
                 );
    
-   assert res["b"] == vint(1);
-   assert res["a"] == vbool(true);
-   assert res["c"] == vstr("asdf");
+   println(res);
+   assert res["cx3"] == vbool(true);
 
    println("ALL TESTS PASSED");
 }
 
-public VEnv testEval(str input_str_ql, map[str, value] inputs){
+public VEnv testEval(str input_str_ql, map[str, value] inputs, bool debugCST = false){
     Tree parsed = parse(#start[Form], input_str_ql);
+   
+   if(debugCST) {
+      println("CST:");
+      println(prettyTree( parsed ));
+   }
+
     AForm ast = cst2ast(parsed);
     RefGraph g = resolve(ast);
     TEnv tenv = collect(ast);

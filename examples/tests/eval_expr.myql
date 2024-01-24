@@ -1,0 +1,23 @@
+form testFormEval { 
+  "question 1" 
+    x : integer
+
+  "question 2"
+    y : integer
+
+  "question 3"
+    x : integer = 69
+
+   "question 4"
+    cx : integer = (2 * x + y)
+    "question 5"
+    cx2 : boolean = (2 * x + y) > 10
+
+    if(cx2 && cx != 0 == true) {
+      "question 6"
+      cx3 : boolean =  !(x > 10) == false != false
+
+      "question 7"
+      y: integer = 2 * x + y
+    } 
+}

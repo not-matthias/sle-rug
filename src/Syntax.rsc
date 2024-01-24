@@ -33,6 +33,9 @@ syntax Expr
   | Bool
   | "(" Expr ")"
 
+  // Unary operators
+  
+  > right "!" Expr // should this be below the comparison operators?
 
   // Arithmetic operators
   > left (
@@ -45,7 +48,6 @@ syntax Expr
   )
 
   // Boolean operators
-  > right "!" Expr
   > left (
     Expr a "\<" Expr b
   | Expr a "\<=" Expr b

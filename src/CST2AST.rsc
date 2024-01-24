@@ -69,6 +69,7 @@ AExpr cst2ast(Expr e) {
       // BUG found: https://www.rascal-mpl.org/docs/Library/Type/#Type-eq
       return equal(cst2ast(e1), cst2ast(e2), src=e.src); 
     }
+    case (Expr)`! <Expr e>`: return not(cst2ast(e), src=e.src);
     case (Expr)`<Expr e1> != <Expr e2>`: return neq(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> && <Expr e2>`: return and(cst2ast(e1), cst2ast(e2), src=e.src);
     case (Expr)`<Expr e1> || <Expr e2>`: return or(cst2ast(e1), cst2ast(e2), src=e.src);

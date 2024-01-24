@@ -25,7 +25,7 @@ alias TEnv = rel[loc def, str name, str label, Type \type];
 TEnv collect(AForm f) {
   TEnv tenv = {};
   
-  // TODO: If/IfElse questions? -> tobias: no, they only consume env (no new bindings)
+
   visit (f) {
     case question(id, label, ty):
       tenv += { <id.src, id.name, label, convertType(ty)> };
@@ -110,7 +110,6 @@ set[Message] check(AQuestion q, TEnv tenv, UseDef useDef) {
   }
 
   // check each expression
-  // tobias: is this too general? i mean atleast we cover all possible expressions
   for (/AExpr expr <- q) {
     msgs += check(expr, tenv, useDef);
   }
@@ -167,8 +166,9 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
 
     // BOOLEAN
     case not(lhs): {
-      if (typeOf(lhs, tenv, useDef) != tbool()) {
-        msgs += { error("NOT operand must be of type bool", lhs.src) };
+      e_t = typeOf(lhs, tenv, useDef);
+      if (e_t != tbool()) {
+        msgs += { error("NOT operand must be of type bool got <e_t>", lhs.src) };
       }
     }
     case and(lhs, rhs): { 
@@ -292,17 +292,4 @@ Type typeOf(AExpr e, TEnv tenv, UseDef useDef) {
   return tunknown(); 
 }
 
-/* 
- * Pattern-based dispatch style:
- * 
- * Type typeOf(ref(id(_, src = loc u)), TEnv tenv, UseDef useDef) = t
- *   when <u, loc d> <- useDef, <d, x, _, Type t> <- tenv
- *
- * ... etc.
- * 
- * default Type typeOf(AExpr _, TEnv _, UseDef _) = tunknown();
- *
- */
  
- 
-

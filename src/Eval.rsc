@@ -34,6 +34,7 @@ alias VEnv = map[str name, Value \value];
 // Modeling user input
 data Input
   = input(str question, Value \value);
+
   
 // produce an environment which for each question has a default value
 // (e.g. 0 for int, "" for str etc.)
@@ -85,6 +86,10 @@ VEnv evalOnce(AForm f, Input inp, VEnv venv) {
   return venv;
 }
 
+
+// keep track of questions currently being evaluated for cyclic dependencies
+
+
 VEnv eval(AQuestion q, Input inp, VEnv venv) {
   // evaluate conditions for branching,
   // evaluate inp and computed questions to return updated VEnv
@@ -94,8 +99,9 @@ VEnv eval(AQuestion q, Input inp, VEnv venv) {
       return venv;
     }
     case calculatedQuestion(AId id, _, _, AExpr expr): {
-      // evaluate expr using venv
-      venv[id.name] = eval(expr, venv);
+      // evaluate expr using current venv if needed
+      venv = venv + (id.name: eval(expr, venv));
+
       return venv;
     }
     case ifQuestion(AExpr cond, qs): {
@@ -132,8 +138,11 @@ VEnv eval(AQuestion q, Input inp, VEnv venv) {
 }
 
 Value eval(AExpr e, VEnv venv) {
+  
   switch (e) {
-    case ref(id(str x)): return venv[x];
+    case ref(id(str x)): {      
+      return venv[x];
+    }
     case intLit(int n): return vint(n);
     case strLit(str s): return vstr(s);
     case boolLit(bool b): return vbool(b);
