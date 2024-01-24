@@ -59,7 +59,7 @@ HTMLElement question2html (AQuestion q) {
       content += input2html(q);
       content += br();
 
-      return div(content, id = "div_<q.id.name>");
+      return div(content, id = "div_<question2id(q)>");
   }
   
   if (q is ifQuestion || q is ifElseQuestion) {
@@ -88,20 +88,21 @@ str expr2str(AExpr expr) {
     case intLit(int x): return toString(x);
     case strLit(str x): return x;
     case boolLit(bool x): return toString(x);
-    case add(lhs, rhs): return (expr2str(lhs) + " + " + expr2str(rhs));
-    case sub(lhs, rhs): return (expr2str(lhs) + " - " + expr2str(rhs));
-    case mul(lhs, rhs): return (expr2str(lhs) + " * " + expr2str(rhs));
-    case div(lhs, rhs): return (expr2str(lhs) + " / " + expr2str(rhs));
+    case add(lhs, rhs): return "(<expr2str(lhs)> + <expr2str(rhs)>)";
+    case sub(lhs, rhs): return "(<expr2str(lhs)> - <expr2str(rhs)>)";
+    case mul(lhs, rhs): return "(<expr2str(lhs)> * <expr2str(rhs)>)";
+    case div(lhs, rhs): return "(<expr2str(lhs)> / <expr2str(rhs)>)";
     // boolean expressions
-    case not(lhs): return ("!" + expr2str(lhs));
-    case and(lhs, rhs): return (expr2str(lhs) + " && " + expr2str(rhs));
-    case or(lhs, rhs): return (expr2str(lhs) + " || " + expr2str(rhs));
-    case equal(lhs, rhs): return  (expr2str(lhs) + " == " + expr2str(rhs));
-    case neq(lhs, rhs): return (expr2str(lhs) + " != " + expr2str(rhs));
-    case lt(lhs, rhs): return  (expr2str(lhs) + " \< " + expr2str(rhs));
-    case lte(lhs, rhs): return (expr2str(lhs) + " \<= " + expr2str(rhs));
-    case gt(lhs, rhs): return  (expr2str(lhs) + " \> " + expr2str(rhs));
-    case gte(lhs, rhs): return (expr2str(lhs) + " \>= " + expr2str(rhs));
+    case not(lhs): return "(!<expr2str(lhs)>)";
+    case and(lhs, rhs): return "(<expr2str(lhs)> && <expr2str(rhs)>)";
+    case or(lhs, rhs): return "(<expr2str(lhs)> || <expr2str(rhs)>)";
+    case equal(lhs, rhs): return "(<expr2str(lhs)> == <expr2str(rhs)>)";
+    case neq(lhs, rhs): return "(<expr2str(lhs)> != <expr2str(rhs)>)";
+    case lt(lhs, rhs): return  "(<expr2str(lhs)> \< <expr2str(rhs)>)";
+    case lte(lhs, rhs): return "(<expr2str(lhs)> \<= <expr2str(rhs)>)";
+    case gt(lhs, rhs): return  "(<expr2str(lhs)> \> <expr2str(rhs)>)";
+    case gt(lhs, rhs): return "(<expr2str(lhs)> \> <expr2str(rhs)>)";
+    case gte(lhs, rhs): return "(<expr2str(lhs)> \>= <expr2str(rhs)>)";
     default: throw "Unhandled expr <expr>";
   }
 }
@@ -115,7 +116,7 @@ HTMLElement input2html(AQuestion q) {
   };
 
   str id = q.id.name;
-  str onChange = "onChange_" + q.id.name + "(this)";
+  str onChange = "onChange_" + id + "(this)";
   
   HTMLElement i = input(\type = inputType, id = id, onchange = onChange);
 
@@ -125,6 +126,14 @@ HTMLElement input2html(AQuestion q) {
   }
 
   return i;
+}
+
+// Returns a unique identifier for each question. This is required
+// when there's 2 questions with the same name but in a different
+// scope. See `x_in_two_blocks.myql` for an example.
+str question2id(AQuestion q) {
+  // https://stackoverflow.com/a/40141409
+  return "<q.id.name>_<q.id.src.begin.line>";
 }
 
 // Javascript related code
@@ -192,14 +201,18 @@ str set_value(AType qtype) {
 // 'Uncaught ReferenceError: can't access lexical declaration 'x_3_4' before initialization'
 // 
 str generate_vars(AForm f) {
-  str code = "";
-  
+  set[str] code = {};
+
   for (/AQuestion q <- f, q is question) {
     str varName = q.id.name;
     code += "let <varName> = <default_value(q.qtype)>;";
   }
 
-  return code;
+  str finalCode = "";
+  for (str c <- code) {
+    finalCode += c;
+  }
+  return finalCode;
 }
 
 str generate_question(AQuestion q, UseDef useDef, AForm f) {
@@ -255,7 +268,7 @@ str generate_questions(AForm f) {
 
 str display_question(AQuestion q, bool show) {
   str displayValue = show ? "block" : "none";
-  str element = "document.querySelector(\"#div_<q.id.name>\")";
+  str element = "document.querySelector(\"#div_<question2id(q)>\")";
   return "<element>.style.display = \"<displayValue>\";";
 }
 
