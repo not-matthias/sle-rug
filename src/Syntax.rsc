@@ -7,7 +7,6 @@ extend lang::std::Id;
  * Concrete syntax of QL
  */
 
-// TODO: Add more keywords
 keyword ControlKeywords = "if" | "else" | "form";
 
 start syntax Form = "form" Id "{" Question* "}"; 
@@ -21,8 +20,6 @@ syntax ConditionalQuestion
 // indirection tradeoff?
 syntax Question = SimpleQuestion | CalculatedQuestion | ConditionalQuestion;
 
-// TODO: Double check this (use correct associativity)
-// TODO: +, -, *, /, &&, ||, !, >, <, <=, >=, ==, !=, literals (bool, int, str)
 // Think about disambiguation using priorities and associativity
 // and use C/Java style precedence rules (look it up on the internet)
 // Associativity reference: https://www.rascal-mpl.org/docs/Rascal/Declarations/SyntaxDefinition/Disambiguation/Associativity/
@@ -35,7 +32,7 @@ syntax Expr
   | "(" Expr ")"
 
   // Unary operators
-  > right "!" Expr // should this be below the comparison operators?
+  > right "!" Expr
 
   // Arithmetic operators
   > left (
