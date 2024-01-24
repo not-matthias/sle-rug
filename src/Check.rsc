@@ -164,10 +164,42 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
         msgs += { error("Division denumerator must be of type int", rhs.src) };
       }
      }
+
+    // BOOLEAN
+    case not(lhs): {
+      if (typeOf(lhs, tenv, useDef) != tbool()) {
+        msgs += { error("NOT operand must be of type bool", lhs.src) };
+      }
+    }
+    case and(lhs, rhs): { 
+      if (typeOf(lhs, tenv, useDef) != tbool()) {
+        msgs += { error("AND operands must be of type bool", lhs.src) };
+      }
+      if (typeOf(rhs, tenv, useDef) != tbool()) {
+        msgs += { error("AND operands must be of type bool", rhs.src) };
+      }
+    }
+    case or(lhs, rhs): { 
+      if (typeOf(lhs, tenv, useDef) != tbool()) {
+        msgs += { error("OR operands must be of type bool", lhs.src) };
+      }
+      if (typeOf(rhs, tenv, useDef) != tbool()) {
+        msgs += { error("OR operands must be of type bool", rhs.src) };
+      }
+    }
     case equal(lhs, rhs): { 
-      //arithmetic equality and logical equality
+      //arithmetic, equality and logical equality
       left_t = typeOf(lhs, tenv, useDef);
       right_t = typeOf(rhs, tenv, useDef);
+
+      if(left_t == tunknown()){
+       msgs += { error("Equality operands cannot be type unknown", lhs.src) }; 
+      }
+      if(right_t == tunknown()){
+       msgs += { error("Equality operands cannot be type unknown", lhs.src) }; 
+      }
+
+      // covers all known types 
       if (left_t != right_t) {
         // error for both locations
         msgs += { error("Equality operands must be of same type", lhs.src) };
@@ -178,6 +210,15 @@ set[Message] check(AExpr e, TEnv tenv, UseDef useDef) {
       //arithmetic equality and logical equality
       left_t = typeOf(lhs, tenv, useDef);
       right_t = typeOf(rhs, tenv, useDef);
+
+      if(left_t == tunknown()){
+       msgs += { error("Inequality operands cannot be type unknown", lhs.src) }; 
+      }
+      if(right_t == tunknown()){
+       msgs += { error("Inequality operands cannot be type unknown", lhs.src) }; 
+      }
+
+      // covers all known types 
       if (left_t != right_t) {
         // error for both locations
         msgs += { error("Inequality operands must be of same type", lhs.src) };

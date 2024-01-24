@@ -137,23 +137,42 @@ Value eval(AExpr e, VEnv venv) {
     case intLit(int n): return vint(n);
     case strLit(str s): return vstr(s);
     case boolLit(bool b): return vbool(b);
-    
     case add(AExpr left, AExpr right): return vint(eval(left, venv).n + eval(right, venv).n);
     case sub(AExpr left, AExpr right): return vint(eval(left, venv).n - eval(right, venv).n);
     case mul(AExpr left, AExpr right): return vint(eval(left, venv).n * eval(right, venv).n);
     case div(AExpr left, AExpr right): return vint(eval(left, venv).n / eval(right, venv).n);
+    // BOOLEAN
+    case not(AExpr e): return vbool(!eval(e, venv).b);
+    case and(AExpr left, AExpr right): return vbool(eval(left, venv).b && eval(right, venv).b);
+    case or(AExpr left, AExpr right): return vbool(eval(left, venv).b || eval(right, venv).b);
+    // COMPARISON
+    case equal(AExpr left, AExpr right): {
+      l_val = eval(left, venv);
+      r_val = eval(right, venv);
+
+      switch(l_val) {
+        case vint(n): return vbool(n == r_val.n);
+        case vbool(b): return vbool(b == r_val.b);
+        case vstr(s): return vbool(s == r_val.s);
+        default: throw "Unexpected equal evaluation operand types <e>";
+      }
+    }
+    case neq(AExpr left, AExpr right): {
+      l_val = eval(left, venv);
+      r_val = eval(right, venv);
+
+      switch(l_val) {
+        case vint(n): return vbool(n != r_val.n);
+        case vbool(b): return vbool(b != r_val.b);
+        case vstr(s): return vbool(s != r_val.s);
+        default: throw "Unexpected inequlity evaluation operand types <e>";
+      }
+    }
+
     case lt(AExpr left, AExpr right): return vbool(eval(left, venv).n < eval(right, venv).n);
     case lte(AExpr left, AExpr right): return vbool(eval(left, venv).n <= eval(right, venv).n);
     case gt(AExpr left, AExpr right): return vbool(eval(left, venv).n > eval(right, venv).n);
     case gte(AExpr left, AExpr right): return vbool(eval(left, venv).n >= eval(right, venv).n);
-    // BOOLEAN
-    // TODO: other cases (string, num, bool)
-    case eq(AExpr left, AExpr right): return vbool(eval(left, venv).n == eval(right, venv).n);
-    case neq(AExpr left, AExpr right): return vbool(eval(left, venv).n != eval(right, venv).n);
-    case and(AExpr left, AExpr right): return vbool(eval(left, venv).b && eval(right, venv).b);
-    case or(AExpr left, AExpr right): return vbool(eval(left, venv).b || eval(right, venv).b);
-
-    // etc.
     
     default: throw "Unsupported expression <e>";
   }
